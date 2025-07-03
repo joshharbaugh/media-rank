@@ -106,6 +106,26 @@ export interface Game extends Media {
   developers?: number[];
 }
 
+export interface GameBoxart {
+  base_url?: {
+    original?: string;
+    small?: string;
+    thumb?: string;
+    cropped_center_thumb?: string;
+    medium?: string;
+    large?: string;
+  };
+  data?: {
+    [key: string]: {
+      id: number;
+      type: string;
+      side: string;
+      filename: string;
+      resolution: string;
+    }[];
+  };
+}
+
 export interface SearchResultsBooks {
   kind: string;
   items: Book[];
@@ -134,17 +154,7 @@ export interface SearchResultsGames {
     games: Game[];
   };
   include?: {
-    boxart?: {
-      base_url?: {
-        original?: string;
-        small?: string;
-        thumb?: string;
-        cropped_center_thumb?: string;
-        medium?: string;
-        large?: string;
-      };
-      data?: unknown;
-    }
+    boxart?: GameBoxart;
   };
   pages?: {
     current?: string;

@@ -4,6 +4,7 @@ import { Media, MediaType, SearchResultsBooks, SearchResultsGames, SearchResults
 import { MediaCard } from '@/components/MediaCard';
 
 import { searchBooks, searchGames, searchMovies, searchShows } from '@/lib/api';
+import { getGameBoxart } from '@/utils/helpers';
 
 interface SearchTabProps {
   onAddToRankings: (media: Media) => void;
@@ -102,10 +103,8 @@ export const SearchTab = ({ onAddToRankings }: SearchTabProps): React.ReactEleme
           ...game,
           type: 'game',
           title: game.game_title,
-          // poster: item.volumeInfo.imageLinks?.thumbnail || item.volumeInfo.imageLinks?.smallThumbnail || `https://placehold.co/400x600?text=${item.volumeInfo.title}`,
-          // rating: item.volumeInfo.averageRating,
-          // overview: item.volumeInfo.description || item.searchInfo?.textSnippet || '',
-          // releaseDate: item.volumeInfo.publishedDate,
+          poster: getGameBoxart(game.id, response.include?.boxart) || `https://placehold.co/400x600?text=${encodeURIComponent(game.game_title)}`,
+          releaseDate: game.release_date,
         }))
       );
       setIsLoading(false);
