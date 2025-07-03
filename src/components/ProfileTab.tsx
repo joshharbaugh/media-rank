@@ -267,7 +267,7 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
                 <span>Movie Buff</span>
               </div>
             )}
-            {stats.avgRating >= 4 && (
+            {Number(stats.avgRating) >= 4 && (
               <div className="flex items-center gap-2 text-sm">
                 <TrendingUp className="w-4 h-4 text-green-500" />
                 <span>Positive Reviewer</span>
