@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Search, Film, Tv, Book, Loader2, Gamepad2 } from 'lucide-react';
-import { Media, MediaType, SearchResultsBooks, SearchResultsMovies, SearchResultsShows } from '@/types';
+import { Media, MediaType, SearchResultsBooks, SearchResultsGames, SearchResultsMovies, SearchResultsShows } from '@/types';
 import { MediaCard } from '@/components/MediaCard';
 
-import { searchBooks, searchMovies, searchShows } from '@/lib/api';
+import { searchBooks, searchGames, searchMovies, searchShows } from '@/lib/api';
 
 interface SearchTabProps {
   onAddToRankings: (media: Media) => void;
@@ -18,7 +18,7 @@ export const SearchTab = ({ onAddToRankings }: SearchTabProps): React.ReactEleme
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!searchQuery.trim()) {
       setSearchResults([]);
       setHasSearched(false);
@@ -92,10 +92,24 @@ export const SearchTab = ({ onAddToRankings }: SearchTabProps): React.ReactEleme
     }
 
     if (mediaType === 'game') {
-      // Placeholder for game search functionality
-      // Currently not implemented, can be extended later
-      setSearchResults([]);
+      const response: SearchResultsGames = await searchGames(searchQuery);
+      const filteredResults = response.data.games.filter(game =>
+        game.game_title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      setSearchResults(
+        filteredResults.map(game => ({
+          ...game,
+          type: 'game',
+          title: game.game_title,
+          // poster: item.volumeInfo.imageLinks?.thumbnail || item.volumeInfo.imageLinks?.smallThumbnail || `https://placehold.co/400x600?text=${item.volumeInfo.title}`,
+          // rating: item.volumeInfo.averageRating,
+          // overview: item.volumeInfo.description || item.searchInfo?.textSnippet || '',
+          // releaseDate: item.volumeInfo.publishedDate,
+        }))
+      );
       setIsLoading(false);
+
       return;
     }
   };

@@ -97,6 +97,15 @@ export interface Show extends Media {
   vote_count?: number;
 }
 
+export interface Game extends Media {
+  game_title: string;
+  release_date?: string;
+  platform?: number;
+  region_id?: number;
+  country_id?: number;
+  developers?: number[];
+}
+
 export interface SearchResultsBooks {
   kind: string;
   items: Book[];
@@ -115,6 +124,36 @@ export interface SearchResultsShows {
   results: Show[];
   total_results: number;
   total_pages: number;
+}
+
+export interface SearchResultsGames {
+  code: number;
+  status: string;
+  data: {
+    count: number;
+    games: Game[];
+  };
+  include?: {
+    boxart?: {
+      base_url?: {
+        original?: string;
+        small?: string;
+        thumb?: string;
+        cropped_center_thumb?: string;
+        medium?: string;
+        large?: string;
+      };
+      data?: unknown;
+    }
+  };
+  pages?: {
+    current?: string;
+    next?: string;
+    previous?: string;
+  };
+  remaining_monthly_allowance?: number;
+  extra_allowance?: number;
+  allowance_refresh_timer?: number;
 }
 
 export interface Ranking {

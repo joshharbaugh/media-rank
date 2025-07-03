@@ -25,3 +25,10 @@ export const searchShows = async (query: string) => {
   );
   return response.json();
 };
+
+export const searchGames = async (query: string) => {
+  const response = await fetch(
+    `/api/games?query=${encodeURIComponent(query)}`
+  );
+  return response.json();
+};
