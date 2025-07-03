@@ -1,0 +1,333 @@
+import React, { useState, useMemo } from 'react';
+import { Star, X, Trophy, Film, Tv, Book, Edit2, Gamepad2 } from 'lucide-react';
+import { Ranking } from '../types';
+import { getMediaIcon } from '../utils/helpers';
+
+interface RankingsTabProps {
+  rankings: Ranking[];
+  onRemoveRanking: (id: string) => void;
+  onEditRanking?: (ranking: Ranking) => void;
+}
+
+type SortOption = 'rank-desc' | 'rank-asc' | 'date-desc' | 'date-asc' | 'title';
+type FilterOption = 'all' | 'movie' | 'tv' | 'book' | 'game';
+
+export const RankingsTab = ({ 
+  rankings, 
+  onRemoveRanking,
+  onEditRanking 
+}: RankingsTabProps): React.ReactNode => {
+  const [sortBy, setSortBy] = useState<SortOption>('rank-desc');
+  const [filterBy, setFilterBy] = useState<FilterOption>('all');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+
+  // Sort and filter rankings
+  const processedRankings = useMemo(() => {
+    let filtered = [...rankings];
+
+    // Apply filter
+    if (filterBy !== 'all') {
+      filtered = filtered.filter(r => r.media.type === filterBy);
+    }
+
+    // Apply sort
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'rank-desc':
+          return b.rank - a.rank;
+        case 'rank-asc':
+          return a.rank - b.rank;
+        case 'date-desc':
+          return new Date(b.id).getTime() - new Date(a.id).getTime();
+        case 'date-asc':
+          return new Date(a.id).getTime() - new Date(b.id).getTime();
+        case 'title':
+          return a.media.title.localeCompare(b.media.title);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [rankings, sortBy, filterBy]);
+
+  // Calculate statistics
+  const stats = useMemo(() => {
+    const movieCount = rankings.filter(r => r.media.type === 'movie').length;
+    const tvCount = rankings.filter(r => r.media.type === 'tv').length;
+    const bookCount = rankings.filter(r => r.media.type === 'book').length;
+    const gameCount = rankings.filter(r => r.media.type === 'game').length;
+    const avgRating = rankings.length > 0 
+      ? (rankings.reduce((sum, r) => sum + r.rank, 0) / rankings.length).toFixed(1)
+      : '0';
+
+    return { movieCount, tvCount, bookCount, gameCount, avgRating };
+  }, [rankings]);
+
+  const handleDelete = (id: string) => {
+    onRemoveRanking(id);
+    setShowDeleteConfirm(null);
+  };
+
+  if (rankings.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+          <Trophy className="w-10 h-10 text-gray-400" />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          No rankings yet!
+        </h2>
+        <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+          Search for your favorite movies, TV shows, books, and games to start building your personal rankings.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header with Stats */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          My Rankings
+        </h2>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+              {rankings.length}
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Total</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+              {stats.avgRating}
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Avg Rating</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+              {stats.movieCount}
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Movies</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+              {stats.tvCount}
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">TV</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+              {stats.bookCount}
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Books</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+              {stats.gameCount}
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Games</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filters and Sort */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        {/* Filter Buttons */}
+        <div className="flex gap-2 flex-1">
+          <button
+            onClick={() => setFilterBy('all')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              filterBy === 'all'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+          >
+            All ({rankings.length})
+          </button>
+          <button
+            onClick={() => setFilterBy('movie')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+              filterBy === 'movie'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+          >
+            <Film className="w-4 h-4" />
+            <span className="hidden sm:inline">Movies</span>
+            <span>({stats.movieCount})</span>
+          </button>
+          <button
+            onClick={() => setFilterBy('tv')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+              filterBy === 'tv'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+          >
+            <Tv className="w-4 h-4" />
+            <span className="hidden sm:inline">TV</span>
+            <span>({stats.tvCount})</span>
+          </button>
+          <button
+            onClick={() => setFilterBy('book')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+              filterBy === 'book'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+          >
+            <Book className="w-4 h-4" />
+            <span className="hidden sm:inline">Books</span>
+            <span>({stats.bookCount})</span>
+          </button>
+          <button
+            onClick={() => setFilterBy('game')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+              filterBy === 'game'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+          >
+            <Gamepad2 className="w-4 h-4" />
+            <span className="hidden sm:inline">Games</span>
+            <span>({stats.gameCount})</span>
+          </button>
+        </div>
+
+        {/* Sort Dropdown */}
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as SortOption)}
+          className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-0 focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="rank-desc">Highest Rated</option>
+          <option value="rank-asc">Lowest Rated</option>
+          <option value="date-desc">Recently Added</option>
+          <option value="date-asc">Oldest First</option>
+          <option value="title">Title A-Z</option>
+        </select>
+      </div>
+
+      {/* Rankings List */}
+      <div className="grid gap-4">
+        {processedRankings.map((ranking, index) => {
+          const Icon = getMediaIcon(ranking.media.type);
+          
+          return (
+            <div
+              key={ranking.id}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4"
+            >
+              <div className="flex items-start gap-4">
+                {/* Rank Number (for top 3) */}
+                {sortBy === 'rank-desc' && index < 3 && (
+                  <div className={`
+                    flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm
+                    ${index === 0 ? 'bg-yellow-400 text-yellow-900' : ''}
+                    ${index === 1 ? 'bg-gray-300 text-gray-700' : ''}
+                    ${index === 2 ? 'bg-orange-400 text-orange-900' : ''}
+                  `}>
+                    {index + 1}
+                  </div>
+                )}
+                
+                {/* Poster */}
+                <img
+                  src={ranking.media.poster}
+                  alt={ranking.media.title}
+                  className="w-16 h-24 sm:w-20 sm:h-30 object-cover rounded shadow-sm"
+                />
+                
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        <span className="truncate">{ranking.media.title}</span>
+                        <Icon className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                      </h3>
+                      
+                      <div className="flex items-center gap-3 mt-1">
+                        {/* Rating */}
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 ${
+                                i < ranking.rank
+                                  ? 'fill-yellow-400 text-yellow-400'
+                                  : 'fill-gray-300 text-gray-300 dark:fill-gray-600 dark:text-gray-600'
+                              }`}
+                            />
+                          ))}
+                          <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">
+                            {ranking.rank}/5
+                          </span>
+                        </div>
+                        
+                        {/* Release Date */}
+                        {ranking.media.releaseDate && (
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            {ranking.media.releaseDate}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Notes */}
+                      {ranking.notes && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
+                          {ranking.notes}
+                        </p>
+                      )}
+                    </div>
+                    
+                    {/* Actions */}
+                    <div className="flex items-center gap-1">
+                      {onEditRanking && (
+                        <button
+                          onClick={() => onEditRanking(ranking)}
+                          className="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                          aria-label="Edit ranking"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                      )}
+                      
+                      {showDeleteConfirm === ranking.id ? (
+                        <div className="flex items-center gap-1 bg-red-50 dark:bg-red-900/20 rounded p-1">
+                          <button
+                            onClick={() => handleDelete(ranking.id)}
+                            className="px-2 py-1 text-xs bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                          >
+                            Delete
+                          </button>
+                          <button
+                            onClick={() => setShowDeleteConfirm(null)}
+                            className="px-2 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setShowDeleteConfirm(ranking.id)}
+                          className="p-1.5 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                          aria-label="Remove ranking"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
