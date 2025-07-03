@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Star, Calendar, MessageSquare, Save, Sparkles } from 'lucide-react';
+import { X, Star, Calendar, Save } from 'lucide-react';
 import { Media, Ranking } from '../types';
 import { getMediaIcon } from '../utils/helpers';
 
