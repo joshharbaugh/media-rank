@@ -1,0 +1,143 @@
+export type MediaType = 'movie' | 'tv' | 'book' | 'game';
+
+export interface Media {
+  id: string;
+  type: MediaType;
+  title: string;
+  releaseDate?: string;
+  poster?: string;
+  overview?: string;
+  rating?: number;
+}
+
+export interface VolumeInfo {
+  title: string;
+  subtitle?: string;
+  authors?: string[];
+  publisher?: string;
+  publishedDate?: string;
+  description?: string;
+  industryIdentifiers?: { type: string; identifier: string }[];
+  readingModes?: { text: boolean; image: boolean };
+  pageCount?: number;
+  printType?: string;
+  categories?: string[];
+  averageRating?: number;
+  ratingsCount?: number;
+  maturityRating?: string;
+  allowAnonLogging?: boolean;
+  contentVersion?: string;
+  panelizationSummary?: { containsEpubBubbles: boolean; containsImageBubbles: boolean };
+  imageLinks?: {
+    smallThumbnail?: string;
+    thumbnail?: string;
+    small?: string;
+    medium?: string;
+    large?: string;
+    extraLarge?: string;
+  };
+  language?: string;
+  previewLink?: string;
+  infoLink?: string;
+  canonicalVolumeLink?: string;
+}
+
+export interface Book extends Media {
+  kind?: string;
+  etag?: string;
+  selfLink?: string;
+  volumeInfo: VolumeInfo;
+  saleInfo?: {
+    country?: string;
+    saleability?: string;
+    isEbook?: boolean;
+  };
+  accessInfo?: {
+    country?: string;
+    viewability?: string;
+    embeddable?: boolean;
+    publicDomain?: boolean;
+    textToSpeechPermission?: string;
+    epub?: { isAvailable: boolean; acsTokenLink?: string };
+    pdf?: { isAvailable: boolean; acsTokenLink?: string };
+    webReaderLink?: string;
+    accessViewStatus?: string;
+    quoteSharingAllowed?: boolean;
+  };
+  searchInfo?: {
+    textSnippet?: string;
+  };
+}
+
+export interface Movie extends Media {
+  adult?: boolean;
+  backdrop_path?: string;
+  genre_ids?: number[];
+  original_language?: string;
+  original_title?: string;
+  popularity?: number;
+  poster_path: string;
+  release_date?: string;
+  vote_average?: number;
+  vote_count?: number;
+}
+
+export interface Show extends Media {
+  adult?: boolean;
+  backdrop_path?: string;
+  genre_ids?: number[];
+  name: string;
+  origin_country?: string[];
+  original_language?: string;
+  original_name?: string;
+  popularity?: number;
+  poster_path: string;
+  first_air_date?: string;
+  vote_average?: number;
+  vote_count?: number;
+}
+
+export interface SearchResultsBooks {
+  kind: string;
+  items: Book[];
+  totalItems: number;
+}
+
+export interface SearchResultsMovies {
+  page: number;
+  results: Movie[];
+  total_results: number;
+  total_pages: number;
+}
+
+export interface SearchResultsShows {
+  page: number;
+  results: Show[];
+  total_results: number;
+  total_pages: number;
+}
+
+export interface Ranking {
+  id: string;
+  mediaId: string;
+  media: Media;
+  rank: number;
+  notes?: string;
+}
+
+export interface User {
+  id: string;
+  username: string;
+  displayName: string;
+  avatar?: string;
+  bio?: string;
+  favoriteGenres: string[];
+}
+
+export interface UserProfile {
+  userId: string;
+  displayName: string;
+  bio?: string;
+  avatar?: string;
+  favoriteGenres: string[];
+}
