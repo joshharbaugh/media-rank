@@ -135,7 +135,7 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
               ) : (
                 <div className="group">
                   <p className="text-gray-600 dark:text-gray-400 pr-8">
-                    {userProfile?.bio || bio}
+                    {userProfile?.bio}
                   </p>
                   <button
                     onClick={() => setIsEditingBio(true)}
