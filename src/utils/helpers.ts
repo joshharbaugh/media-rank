@@ -1,6 +1,16 @@
 import { Film, Tv, Book, Gamepad2, Music } from 'lucide-react';
 import { GameBoxart } from '@/types';
 
+export const getInitials = (name: string | null) => {
+  if (!name) return '?';
+  return name
+    .split(' ')
+    .map(part => part[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+};
+
 export const getMediaIcon = (type: string) => {
   switch (type) {
     case 'movie': return Film;

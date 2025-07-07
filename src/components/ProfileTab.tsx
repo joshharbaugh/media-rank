@@ -1,12 +1,14 @@
 import React, { useMemo, useState } from 'react';
-import { 
-  // User, Hash,
-  Camera, Edit3, Trophy, Star, TrendingUp, 
+import {
+  Camera, Edit3, Trophy, Star, TrendingUp,
   Film, Tv, Book, BarChart3, PieChart, Calendar,
   Award, Sparkles, Gamepad2
 } from 'lucide-react';
-import { Ranking } from '../types';
-import { getMediaIcon } from '../utils/helpers';
+import { Ranking } from '@/types';
+import { getInitials, getMediaIcon } from '@/utils/helpers';
+import { useUserStore } from '@/store/userStore';
+import { db } from '@/lib/firebase';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 interface ProfileTabProps {
   rankings: Ranking[];
@@ -17,9 +19,10 @@ interface ProfileTabProps {
 // }
 
 export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement => {
+  const userProfile = useUserStore((state) => state.profile);
+  const updateProfile = useUserStore((state) => state.updateProfile);
   const [isEditingBio, setIsEditingBio] = useState(false);
-  const [bio, setBio] = useState('Movie enthusiast and binge-watcher. Always looking for the next great story to dive into.');
-  const [tempBio, setTempBio] = useState(bio);
+  const [tempBio, setTempBio] = useState(userProfile?.bio);
 
   // Calculate comprehensive statistics
   const stats = useMemo(() => {
@@ -27,28 +30,28 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
     const tvCount = rankings.filter(r => r.media.type === 'tv').length;
     const bookCount = rankings.filter(r => r.media.type === 'book').length;
     const gameCount = rankings.filter(r => r.media.type === 'game').length;
-    
+
     const totalRatings = rankings.reduce((sum, r) => sum + r.rank, 0);
     const avgRating = rankings.length > 0 ? (totalRatings / rankings.length).toFixed(2) : '0.00';
-    
+
     // Find highest and lowest rated
     const sortedByRating = [...rankings].sort((a, b) => b.rank - a.rank);
     const highestRated = sortedByRating[0];
     const lowestRated = sortedByRating[sortedByRating.length - 1];
-    
+
     // Calculate rating distribution
     const ratingDistribution = [0, 0, 0, 0, 0];
     rankings.forEach(r => {
       ratingDistribution[r.rank - 1]++;
     });
-    
+
     // Most common rating
     const mostCommonRatingIndex = ratingDistribution.indexOf(Math.max(...ratingDistribution));
     const mostCommonRating = mostCommonRatingIndex + 1;
-    
+
     // Recent activity (last 7 rankings)
     const recentRankings = [...rankings].slice(-7).reverse();
-    
+
     return {
       total: rankings.length,
       movieCount,
@@ -65,16 +68,21 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
     };
   }, [rankings]);
 
-  // Mock favorite genres based on rankings
-  const favoriteGenres = ['Sci-Fi', 'Drama', 'Thriller', 'Documentary', 'Comedy'];
+  const handleSaveBio = async () => {
+    if (!userProfile) return;
+    const userRef = doc(db, 'users', userProfile?.uid);
 
-  const handleSaveBio = () => {
-    setBio(tempBio);
+    await setDoc(userRef, {
+      bio: tempBio,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    updateProfile({ ...userProfile, bio: tempBio });
+
     setIsEditingBio(false);
   };
 
   const handleCancelBio = () => {
-    setTempBio(bio);
+    setTempBio(userProfile?.bio);
     setIsEditingBio(false);
   };
 
@@ -86,18 +94,18 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
           {/* Avatar */}
           <div className="relative group">
             <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-              JD
+              {getInitials(userProfile?.displayName || userProfile?.email || null)}
             </div>
             <button className="absolute bottom-0 right-0 p-1.5 bg-white dark:bg-gray-700 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
               <Camera className="w-4 h-4 text-gray-600 dark:text-gray-300" />
             </button>
           </div>
-          
+
           {/* User Info */}
           <div className="flex-1 text-center sm:text-left">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">John Doe</h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-3">@johndoe</p>
-            
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{userProfile?.displayName}</h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-3">{userProfile?.email}</p>
+
             {/* Bio Section */}
             <div className="relative">
               {isEditingBio ? (
@@ -127,7 +135,7 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
               ) : (
                 <div className="group">
                   <p className="text-gray-600 dark:text-gray-400 pr-8">
-                    {bio}
+                    {userProfile?.bio || bio}
                   </p>
                   <button
                     onClick={() => setIsEditingBio(true)}
@@ -139,7 +147,7 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
               )}
             </div>
           </div>
-          
+
           {/* Quick Stats */}
           <div className="flex sm:flex-col gap-4 sm:gap-2 text-center">
             <div className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
@@ -152,7 +160,7 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
             </div>
           </div>
         </div>
-        
+
         {/* Favorite Genres */}
         <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
@@ -160,7 +168,7 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
             Favorite Genres
           </h3>
           <div className="flex flex-wrap gap-2">
-            {favoriteGenres.map((genre) => (
+            {userProfile?.favoriteGenres.map((genre) => (
               <span
                 key={genre}
                 className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm"
@@ -229,8 +237,8 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
                 <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                   <div
                     className="bg-indigo-600 dark:bg-indigo-400 h-full transition-all duration-500"
-                    style={{ 
-                      width: `${stats.total > 0 ? (stats.ratingDistribution[rating - 1] / stats.total) * 100 : 0}%` 
+                    style={{
+                      width: `${stats.total > 0 ? (stats.ratingDistribution[rating - 1] / stats.total) * 100 : 0}%`
                     }}
                   />
                 </div>

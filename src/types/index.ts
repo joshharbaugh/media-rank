@@ -174,19 +174,19 @@ export interface Ranking {
   notes?: string;
 }
 
-export interface User {
-  id: string;
-  username: string;
-  displayName: string;
-  avatar?: string;
-  bio?: string;
-  favoriteGenres: string[];
+export interface RankingDocument extends Ranking {
+  userId: string;
+  createdAt: unknown; // Firestore Timestamp
+  updatedAt: unknown; // Firestore Timestamp
 }
 
 export interface UserProfile {
-  userId: string;
+  uid: string;
+  email: string | null;
   displayName: string;
-  bio?: string;
-  avatar?: string;
+  bio: string;
+  photoURL: string | null;
   favoriteGenres: string[];
+  createdAt: unknown; // Firestore Timestamp
+  updatedAt: unknown; // Firestore Timestamp
 }
