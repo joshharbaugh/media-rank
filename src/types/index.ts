@@ -1,3 +1,5 @@
+import { Timestamp } from 'firebase/firestore';
+
 export type MediaType = 'movie' | 'tv' | 'book' | 'game';
 
 export interface Media {
@@ -176,8 +178,8 @@ export interface Ranking {
 
 export interface RankingDocument extends Ranking {
   userId: string;
-  createdAt: unknown; // Firestore Timestamp
-  updatedAt: unknown; // Firestore Timestamp
+  createdAt: Timestamp; // Firestore Timestamp
+  updatedAt: Timestamp; // Firestore Timestamp
 }
 
 export interface UserProfile {
@@ -187,6 +189,18 @@ export interface UserProfile {
   bio: string;
   photoURL: string | null;
   favoriteGenres: string[];
-  createdAt: unknown; // Firestore Timestamp
-  updatedAt: unknown; // Firestore Timestamp
+  createdAt: Timestamp; // Firestore Timestamp
+  updatedAt: Timestamp; // Firestore Timestamp
+}
+
+export interface UserStats {
+  total: number;
+  movieCount: number;
+  tvCount: number;
+  bookCount: number;
+  gameCount: number;
+  avgRating: number;
+  highestRated: Ranking;
+  lowestRated: Ranking;
+  recentRankings: Ranking[];
 }

@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Star, X, Trophy, Film, Tv, Book, Edit2, Gamepad2 } from 'lucide-react';
-import { Ranking } from '../types';
-import { getMediaIcon } from '../utils/helpers';
+import { Ranking, UserStats } from '@/types';
+import { getMediaIcon } from '@/utils/helpers';
+import { useRankings } from '@/hooks/useRankings';
 
 interface RankingsTabProps {
   rankings: Ranking[];
@@ -12,14 +13,16 @@ interface RankingsTabProps {
 type SortOption = 'rank-desc' | 'rank-asc' | 'date-desc' | 'date-asc' | 'title';
 type FilterOption = 'all' | 'movie' | 'tv' | 'book' | 'game';
 
-export const RankingsTab = ({ 
-  rankings, 
+export const RankingsTab = ({
+  rankings,
   onRemoveRanking,
-  onEditRanking 
+  onEditRanking
 }: RankingsTabProps): React.ReactNode => {
+  const { getUserStats } = useRankings();
   const [sortBy, setSortBy] = useState<SortOption>('rank-desc');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [stats, setStats] = useState<UserStats | null>(null);
 
   // Sort and filter rankings
   const processedRankings = useMemo(() => {
@@ -51,18 +54,19 @@ export const RankingsTab = ({
     return filtered;
   }, [rankings, sortBy, filterBy]);
 
-  // Calculate statistics
-  const stats = useMemo(() => {
-    const movieCount = rankings.filter(r => r.media.type === 'movie').length;
-    const tvCount = rankings.filter(r => r.media.type === 'tv').length;
-    const bookCount = rankings.filter(r => r.media.type === 'book').length;
-    const gameCount = rankings.filter(r => r.media.type === 'game').length;
-    const avgRating = rankings.length > 0 
-      ? (rankings.reduce((sum, r) => sum + r.rank, 0) / rankings.length).toFixed(1)
-      : '0';
+  // Get user stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const userStats = await getUserStats();
+        setStats(userStats);
+      } catch (error) {
+        console.error('Error fetching user stats:', error);
+      }
+    };
 
-    return { movieCount, tvCount, bookCount, gameCount, avgRating };
-  }, [rankings]);
+    fetchStats();
+  }, [getUserStats]);
 
   const handleDelete = (id: string) => {
     onRemoveRanking(id);
@@ -92,7 +96,7 @@ export const RankingsTab = ({
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
           My Rankings
         </h2>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
@@ -102,31 +106,31 @@ export const RankingsTab = ({
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-              {stats.avgRating}
+              {stats?.avgRating ?? 0}
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400">Avg Rating</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-              {stats.movieCount}
+              {stats?.movieCount ?? 0}
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400">Movies</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-              {stats.tvCount}
+              {stats?.tvCount ?? 0}
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400">TV</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-              {stats.bookCount}
+              {stats?.bookCount ?? 0}
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400">Books</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-              {stats.gameCount}
+              {stats?.gameCount ?? 0}
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400">Games</div>
           </div>
@@ -157,7 +161,7 @@ export const RankingsTab = ({
           >
             <Film className="w-4 h-4" />
             <span className="hidden sm:inline">Movies</span>
-            <span>({stats.movieCount})</span>
+            <span>({stats?.movieCount ?? 0})</span>
           </button>
           <button
             onClick={() => setFilterBy('tv')}
@@ -169,7 +173,7 @@ export const RankingsTab = ({
           >
             <Tv className="w-4 h-4" />
             <span className="hidden sm:inline">TV</span>
-            <span>({stats.tvCount})</span>
+            <span>({stats?.tvCount ?? 0})</span>
           </button>
           <button
             onClick={() => setFilterBy('book')}
@@ -181,7 +185,7 @@ export const RankingsTab = ({
           >
             <Book className="w-4 h-4" />
             <span className="hidden sm:inline">Books</span>
-            <span>({stats.bookCount})</span>
+            <span>({stats?.bookCount ?? 0})</span>
           </button>
           <button
             onClick={() => setFilterBy('game')}
@@ -193,7 +197,7 @@ export const RankingsTab = ({
           >
             <Gamepad2 className="w-4 h-4" />
             <span className="hidden sm:inline">Games</span>
-            <span>({stats.gameCount})</span>
+            <span>({stats?.gameCount ?? 0})</span>
           </button>
         </div>
 
@@ -215,7 +219,7 @@ export const RankingsTab = ({
       <div className="grid gap-4">
         {processedRankings.map((ranking, index) => {
           const Icon = getMediaIcon(ranking.media.type);
-          
+
           return (
             <div
               key={ranking.id}
@@ -233,14 +237,14 @@ export const RankingsTab = ({
                     {index + 1}
                   </div>
                 )}
-                
+
                 {/* Poster */}
                 <img
                   src={ranking.media.poster}
                   alt={ranking.media.title}
                   className="w-16 h-24 sm:w-20 sm:h-30 object-cover rounded shadow-sm"
                 />
-                
+
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
@@ -249,7 +253,7 @@ export const RankingsTab = ({
                         <span className="truncate">{ranking.media.title}</span>
                         <Icon className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                       </h3>
-                      
+
                       <div className="flex items-center gap-3 mt-1">
                         {/* Rating */}
                         <div className="flex items-center gap-1">
@@ -267,7 +271,7 @@ export const RankingsTab = ({
                             {ranking.rank}/5
                           </span>
                         </div>
-                        
+
                         {/* Release Date */}
                         {ranking.media.releaseDate && (
                           <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -275,7 +279,7 @@ export const RankingsTab = ({
                           </span>
                         )}
                       </div>
-                      
+
                       {/* Notes */}
                       {ranking.notes && (
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
@@ -283,7 +287,7 @@ export const RankingsTab = ({
                         </p>
                       )}
                     </div>
-                    
+
                     {/* Actions */}
                     <div className="flex items-center gap-1">
                       {onEditRanking && (
@@ -295,7 +299,7 @@ export const RankingsTab = ({
                           <Edit2 className="w-4 h-4" />
                         </button>
                       )}
-                      
+
                       {showDeleteConfirm === ranking.id ? (
                         <div className="flex items-center gap-1 bg-red-50 dark:bg-red-900/20 rounded p-1">
                           <button

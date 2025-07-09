@@ -13,13 +13,14 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Media, Ranking } from '@/types';
 import { useThemeStore } from '@/store/themeStore';
 import { AuthProvider } from '@/contexts/Auth';
+import { useRankings } from '@/hooks/useRankings';
 
 type TabType = 'search' | 'rankings' | 'profile';
 
 function AppContent() {
   const { theme } = useThemeStore();
+  const { rankings, addRanking, deleteRanking } = useRankings();
   const [activeTab, setActiveTab] = useState<TabType>('search');
-  const [rankings, setRankings] = useState<Ranking[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
 
@@ -42,13 +43,15 @@ function AppContent() {
   };
 
   const handleSaveRanking = (ranking: Ranking) => {
-    setRankings([...rankings, ranking]);
+    // setRankings([...rankings, ranking]); // TODO: Remove this
+    addRanking(ranking.media, ranking.rank, ranking.notes);
     setShowAddModal(false);
     setSelectedMedia(null);
   };
 
   const handleRemoveRanking = (id: string) => {
-    setRankings(rankings.filter(r => r.id !== id));
+    // setRankings(rankings.filter(r => r.id !== id)); // TODO: Remove this
+    deleteRanking(id);
   };
 
   return (
