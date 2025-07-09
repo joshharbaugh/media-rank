@@ -6,7 +6,7 @@ interface UserStore {
   user: User | null;
   profile: UserProfile | null;
   setUser: (user: User | null) => void;
-  setProfile: (user: UserProfile | null) => void;
+  setProfile: (profile: UserProfile | null) => void;
   updateProfile: (profile: Partial<UserProfile>) => void;
   logout: () => void;
 }

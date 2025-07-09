@@ -32,6 +32,10 @@ function AppContent() {
     }
   }, [theme]);
 
+  window.addEventListener('navigate-to-profile', () => {
+    setActiveTab('profile');
+  });
+
   const handleAddToRankings = (media: Media) => {
     setSelectedMedia(media);
     setShowAddModal(true);
