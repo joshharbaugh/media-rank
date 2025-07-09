@@ -10,7 +10,7 @@ import {
   sendPasswordResetEmail
 } from 'firebase/auth';
 import { auth, googleProvider, db } from '@/lib/firebase';
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, getDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { useUserStore } from '@/store/userStore';
 import { UserProfile } from '@/types';
 
@@ -62,15 +62,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         photoURL: user.photoURL || null,
         bio: '',
         favoriteGenres: [],
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        createdAt: serverTimestamp() as Timestamp,
+        updatedAt: serverTimestamp() as Timestamp
       }
       await setDoc(userRef, profile);
       setProfile(profile);
     } else {
       // Update last login
       await setDoc(userRef, {
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp() as Timestamp
       }, { merge: true });
       setProfile(userSnap.data() as UserProfile);
     }
