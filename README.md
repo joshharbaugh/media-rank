@@ -111,6 +111,16 @@ The app integrates with multiple APIs to provide comprehensive media search:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+## Future Updates
+
+Outlines improvements that are on the roadmap for future releases. These updates are intended to enhance user experience, expand media coverage, and introduce new ways to interact with your rankings and profile.
+
+1. Music (track, albums, artist) search and Rankings
+2. Drag & Drop ranking changes (move rankings around manually)
+3. Family Profiles
+4. User settings
+5. Unit & Integration Tests
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
