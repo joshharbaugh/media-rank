@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
 import { Search, Film, Tv, Book, Loader2, Gamepad2 } from 'lucide-react';
-import { Media, MediaType, SearchResultsBooks, SearchResultsGames, SearchResultsMovies, SearchResultsShows } from '@/types';
+import { Media, MediaType } from '@/types';
 import { MediaCard } from '@/components/MediaCard';
-
-import { searchBooks, searchGames, searchMovies, searchShows } from '@/lib/api';
-import { getGameBoxart } from '@/utils/helpers';
+import { useSearch } from '@/hooks/useSearch';
 
 interface SearchTabProps {
   onAddToRankings: (media: Media) => void;
 }
 
 export const SearchTab = ({ onAddToRankings }: SearchTabProps): React.ReactElement => {
+  const { searchMedia, searchResults, setSearchResults, isLoading, setIsLoading } = useSearch();
   const [mediaType, setMediaType] = useState<MediaType>('movie');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Media[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -29,89 +26,7 @@ export const SearchTab = ({ onAddToRankings }: SearchTabProps): React.ReactEleme
     setIsLoading(true);
     setHasSearched(true);
 
-    if (mediaType === 'movie') {
-      const response: SearchResultsMovies = await searchMovies(searchQuery);
-      const filteredResults = response.results.filter(movie =>
-        movie.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        movie.original_language?.toLowerCase() === 'en'
-      );
-
-      setSearchResults(
-        filteredResults.map(movie => ({
-          ...movie,
-          type: 'movie',
-          poster: movie.poster_path ? `https://image.tmdb.org/t/p/w400${movie.poster_path}` : `https://placehold.co/400x600?text=${movie.title}`,
-          rating: (movie.vote_average && movie.vote_average > 0) ? movie.vote_average : undefined,
-          releaseDate: movie.release_date,
-        }))
-      );
-      setIsLoading(false);
-
-      return;
-    }
-
-    if (mediaType === 'tv') {
-      const response: SearchResultsShows = await searchShows(searchQuery);
-      const filteredResults = response.results.filter(show =>
-        show.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-      setSearchResults(
-        filteredResults.map(show => ({
-          ...show,
-          type: 'tv',
-          title: show.name,
-          poster: show.poster_path ? `https://image.tmdb.org/t/p/w400${show.poster_path}` : `https://placehold.co/400x600?text=${show.name}`,
-          rating: (show.vote_average && show.vote_average > 0) ? show.vote_average : undefined,
-          releaseDate: show.first_air_date,
-        }))
-      );
-      setIsLoading(false);
-
-      return;
-    }
-
-    if (mediaType === 'book') {
-      const response: SearchResultsBooks = await searchBooks(searchQuery);
-      const filteredResults = response.items.filter(item =>
-        item.volumeInfo.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-      setSearchResults(
-        filteredResults.map(item => ({
-          ...item,
-          type: 'book',
-          title: item.volumeInfo.title,
-          poster: item.volumeInfo.imageLinks?.thumbnail || item.volumeInfo.imageLinks?.smallThumbnail || `https://placehold.co/400x600?text=${item.volumeInfo.title}`,
-          rating: item.volumeInfo.averageRating,
-          overview: item.volumeInfo.description || item.searchInfo?.textSnippet || '',
-          releaseDate: item.volumeInfo.publishedDate,
-        }))
-      );
-      setIsLoading(false);
-
-      return;
-    }
-
-    if (mediaType === 'game') {
-      const response: SearchResultsGames = await searchGames(searchQuery);
-      const filteredResults = response.data.games.filter(game =>
-        game.game_title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-      setSearchResults(
-        filteredResults.map(game => ({
-          ...game,
-          type: 'game',
-          title: game.game_title,
-          poster: getGameBoxart(game.id, response.include?.boxart) || `https://placehold.co/400x600?text=${encodeURIComponent(game.game_title)}`,
-          releaseDate: game.release_date,
-        }))
-      );
-      setIsLoading(false);
-
-      return;
-    }
+    searchMedia(mediaType, searchQuery);
   };
 
   const handleMediaTypeChange = (type: MediaType) => {
