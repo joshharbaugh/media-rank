@@ -4,11 +4,11 @@ import { Media, MediaType } from '@/types';
 import { MediaCard } from '@/components/MediaCard';
 import { useSearch } from '@/hooks/useSearch';
 
-interface SearchTabProps {
+interface SearchProps {
   onAddToRankings: (media: Media) => void;
 }
 
-export const SearchTab = ({ onAddToRankings }: SearchTabProps): React.ReactElement => {
+export const SearchView = ({ onAddToRankings }: SearchProps): React.ReactElement => {
   const { searchMedia, searchResults, setSearchResults, isLoading, setIsLoading } = useSearch();
   const [mediaType, setMediaType] = useState<MediaType>('movie');
   const [searchQuery, setSearchQuery] = useState('');

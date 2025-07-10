@@ -14,7 +14,7 @@ interface RankingsTabProps {
 type SortOption = 'rank-desc' | 'rank-asc' | 'date-desc' | 'date-asc' | 'title';
 type FilterOption = 'all' | 'movie' | 'tv' | 'book' | 'game';
 
-export const RankingsTab = ({
+export const RankingsView = ({
   rankings,
   onRemoveRanking,
   onEditRanking

@@ -19,7 +19,7 @@ interface ProfileTabProps {
 //   [key: string]: number;
 // }
 
-export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement => {
+export const ProfileView = ({ rankings }: ProfileTabProps): React.ReactElement => {
   const { getUserStats } = useRankings();
   const userProfile = useUserStore((state) => state.profile);
   const updateProfile = useUserStore((state) => state.updateProfile);

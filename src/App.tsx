@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 
 import { Header } from '@/components/Header';
 import { Navigation } from '@/components/Navigation';
-import { SearchTab } from '@/components/SearchTab';
-import { RankingsTab } from '@/components/RankingsTab';
-import { ProfileTab } from '@/components/ProfileTab';
+import { SearchView } from '@/views/Search';
+import { RankingsView } from '@/views/Rankings';
+import { ProfileView } from '@/views/Profile';
 import { AddRankingModal } from '@/components/AddRankingModal';
 import { LoginPage } from '@/components/auth/LoginPage';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -81,12 +81,12 @@ function AppContent() {
 
       <main className="max-w-6xl mx-auto px-4 py-8">
         <Routes>
-          <Route path="/" element={<SearchTab onAddToRankings={handleAddToRankings} />} />
-          <Route path="/search" element={<SearchTab onAddToRankings={handleAddToRankings} />} />
+          <Route path="/" element={<SearchView onAddToRankings={handleAddToRankings} />} />
+          <Route path="/search" element={<SearchView onAddToRankings={handleAddToRankings} />} />
           <Route
             path="/rankings"
             element={
-              <RankingsTab
+              <RankingsView
                 rankings={rankings}
                 onRemoveRanking={handleRemoveRanking}
                 onEditRanking={handleEditRanking}
@@ -95,7 +95,7 @@ function AppContent() {
           />
           <Route
             path="/profile"
-            element={<ProfileTab rankings={rankings} />}
+            element={<ProfileView rankings={rankings} />}
           />
         </Routes>
       </main>
