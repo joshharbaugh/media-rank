@@ -31,7 +31,7 @@ export const RankingsTab = ({
 
     // Apply filter
     if (filterBy !== 'all') {
-      filtered = filtered.filter(r => r.media.type === filterBy);
+      filtered = filtered.filter(r => r.media?.type === filterBy);
     }
 
     // Apply sort
@@ -46,7 +46,7 @@ export const RankingsTab = ({
         case 'date-asc':
           return (a.createdAt?.toDate().getTime() ?? 0) - (b.createdAt?.toDate().getTime() ?? 0);
         case 'title':
-          return a.media.title.localeCompare(b.media.title);
+          return a.media?.title.localeCompare(b.media?.title || '') || 0;
         default:
           return 0;
       }
@@ -75,7 +75,7 @@ export const RankingsTab = ({
     };
 
     fetchStats();
-  }, [getUserStats]);
+  }, [getUserStats, rankings]);
 
   const handleDelete = (id: string) => {
     onRemoveRanking(id);
@@ -223,7 +223,7 @@ export const RankingsTab = ({
       {/* Rankings List */}
       <div className="grid gap-4">
         {processedRankings.map((ranking, index) => {
-          const Icon = getMediaIcon(ranking.media.type);
+          const Icon = getMediaIcon(ranking.media?.type || 'movie');
 
           return (
             <div
@@ -245,7 +245,7 @@ export const RankingsTab = ({
 
                 {/* Poster */}
                 <img
-                  src={ranking.media.poster}
+                  src={ranking.media?.poster}
                   alt=''
                   className="w-16 h-24 sm:w-20 sm:h-30 object-cover rounded shadow-sm"
                 />
@@ -255,7 +255,7 @@ export const RankingsTab = ({
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                        <span className="text-ellipsis line-clamp-1">{ranking.media.title}</span>
+                        <span className="text-ellipsis line-clamp-1">{ranking.media?.title}</span>
                         <Icon className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                       </h3>
 
@@ -278,9 +278,9 @@ export const RankingsTab = ({
                         </div>
 
                         {/* Release Date */}
-                        {ranking.media.releaseDate && (
+                        {ranking.media?.releaseDate && (
                           <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {ranking.media.releaseDate}
+                            {ranking.media?.releaseDate}
                           </span>
                         )}
                       </div>

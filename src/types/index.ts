@@ -171,7 +171,7 @@ export interface SearchResultsGames {
 export interface Ranking {
   id: string;
   mediaId: string;
-  media: Media;
+  media?: Media;
   rank: number;
   notes?: string;
   userId?: string;

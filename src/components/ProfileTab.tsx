@@ -26,10 +26,10 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
 
   // Calculate comprehensive statistics
   const stats = useMemo(() => {
-    const movieCount = rankings.filter(r => r.media.type === 'movie').length;
-    const tvCount = rankings.filter(r => r.media.type === 'tv').length;
-    const bookCount = rankings.filter(r => r.media.type === 'book').length;
-    const gameCount = rankings.filter(r => r.media.type === 'game').length;
+    const movieCount = rankings.filter(r => r.media?.type === 'movie').length;
+    const tvCount = rankings.filter(r => r.media?.type === 'tv').length;
+    const bookCount = rankings.filter(r => r.media?.type === 'book').length;
+    const gameCount = rankings.filter(r => r.media?.type === 'game').length;
 
     const totalRatings = rankings.reduce((sum, r) => sum + r.rank, 0);
     const avgRating = rankings.length > 0 ? (totalRatings / rankings.length).toFixed(2) : '0.00';
@@ -296,12 +296,12 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
             </h3>
             <div className="flex items-center gap-3">
               <img
-                src={stats.highestRated.media.poster}
-                alt={stats.highestRated.media.title}
+                src={stats.highestRated.media?.poster}
+                alt={stats.highestRated.media?.title}
                 className="w-16 h-24 object-cover rounded shadow"
               />
               <div>
-                <h4 className="font-medium">{stats.highestRated.media.title}</h4>
+                <h4 className="font-medium">{stats.highestRated?.media?.title || 'No title'}</h4>
                 <div className="flex items-center gap-1 mt-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -326,12 +326,12 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
             </h3>
             <div className="flex items-center gap-3">
               <img
-                src={stats.lowestRated.media.poster}
-                alt={stats.lowestRated.media.title}
+                src={stats.lowestRated.media?.poster}
+                alt={stats.lowestRated.media?.title}
                 className="w-16 h-24 object-cover rounded shadow"
               />
               <div>
-                <h4 className="font-medium">{stats.lowestRated.media.title}</h4>
+                <h4 className="font-medium">{stats.lowestRated?.media?.title || 'No title'}</h4>
                 <div className="flex items-center gap-1 mt-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -359,17 +359,17 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
           </h3>
           <div className="space-y-3">
             {stats.recentRankings.map((ranking) => {
-              const Icon = getMediaIcon(ranking.media.type);
+              const Icon = getMediaIcon(ranking.media?.type || 'movie');
               return (
                 <div key={ranking.id} className="flex items-center gap-3 pb-3 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0">
                   <img
-                    src={ranking.media.poster}
-                    alt={ranking.media.title}
+                    src={ranking.media?.poster}
+                    alt={ranking.media?.title}
                     className="w-12 h-18 object-cover rounded"
                   />
                   <div className="flex-1">
                     <p className="font-medium text-sm flex items-center gap-2">
-                      {ranking.media.title}
+                      {ranking.media?.title}
                       <Icon className="w-3 h-3 text-gray-400" />
                     </p>
                     <div className="flex items-center gap-1 mt-0.5">

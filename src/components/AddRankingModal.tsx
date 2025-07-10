@@ -4,7 +4,7 @@ import { Media, Ranking } from '../types';
 import { getMediaIcon } from '../utils/helpers';
 
 interface AddRankingModalProps {
-  media: Media;
+  media?: Media;
   onSave: (ranking: Ranking) => void;
   onClose: () => void;
   existingRanking?: Ranking;
@@ -42,7 +42,7 @@ export const AddRankingModal = ({
   const notesRef = useRef<HTMLTextAreaElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  const Icon = getMediaIcon(media.type);
+  const Icon = getMediaIcon(media?.type || 'movie');
   const currentRating = hoveredStar || rankValue;
   const ratingInfo = ratingDescriptions.find(r => r.rating === currentRating);
 
@@ -66,7 +66,7 @@ export const AddRankingModal = ({
   const handleSave = () => {
     const newRanking: Ranking = {
       id: existingRanking?.id || Date.now().toString(),
-      mediaId: media.id,
+      mediaId: media?.id || '',
       media: media,
       rank: rankValue,
       notes: notes.trim()
@@ -124,23 +124,23 @@ export const AddRankingModal = ({
           {/* Media Info */}
           <div className="flex items-center gap-4">
             <img
-              src={media.poster}
-              alt={media.title}
+              src={media?.poster}
+              alt={media?.title}
               className="w-16 h-24 object-cover rounded shadow-sm"
             />
             <div className="flex-1">
               <h4 className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-1">
-                {media.title}
+                {media?.title}
               </h4>
               <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400">
                 <Icon className="w-4 h-4" />
-                <span>{media.releaseDate}</span>
-                {media.rating && (
+                <span>{media?.releaseDate}</span>
+                {media?.rating && (
                   <>
                     <span>•</span>
                     <div className="flex items-center gap-1">
                       <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                      <span>{media.rating}</span>
+                      <span>{media?.rating}</span>
                     </div>
                   </>
                 )}
@@ -228,13 +228,15 @@ export const AddRankingModal = ({
             </p>
           </div>
 
-          {/* Date Added */}
-          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-            <Calendar className="w-4 h-4" />
-            <span>
-              {existingRanking ? 'Updated' : 'Added'} on {new Date().toLocaleDateString()}
-            </span>
-          </div>
+          {/* Date Added / Updated */}
+          {existingRanking && (
+            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+              <Calendar className="w-4 h-4" />
+              <span>
+                {existingRanking?.updatedAt ? 'Updated' : 'Added'} on {existingRanking?.updatedAt ? existingRanking?.updatedAt?.toDate().toLocaleDateString() : existingRanking?.createdAt?.toDate().toLocaleDateString()}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Footer */}

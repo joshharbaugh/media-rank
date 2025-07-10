@@ -17,8 +17,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 export interface RankingDocument extends Omit<Ranking, 'id'> {
   userId: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
 }
 
 export class RankingService {
@@ -35,10 +35,16 @@ export class RankingService {
       const rankingsRef = this.getUserRankingsRef(userId);
       const rankingDoc: RankingDocument = {
         ...ranking,
-        userId,
-        createdAt: ranking.id ? Timestamp.now() : serverTimestamp() as Timestamp,
-        updatedAt: serverTimestamp() as Timestamp
+        userId
       };
+
+      // Update the updatedAt field if the ranking already exists
+      if (ranking.createdAt) {
+        rankingDoc.updatedAt = serverTimestamp() as Timestamp;
+      } else {
+        // Set the createdAt field if the ranking is new
+        rankingDoc.createdAt = serverTimestamp() as Timestamp;
+      }
 
       await setDoc(doc(rankingsRef, ranking.id), rankingDoc);
     } catch (error) {
@@ -134,10 +140,10 @@ export class RankingService {
 
       const stats: UserStats = {
         total: rankings.length,
-        movieCount: rankings.filter(r => r.media.type === 'movie').length,
-        tvCount: rankings.filter(r => r.media.type === 'tv').length,
-        bookCount: rankings.filter(r => r.media.type === 'book').length,
-        gameCount: rankings.filter(r => r.media.type === 'game').length,
+        movieCount: rankings.filter(r => r.media?.type === 'movie').length,
+        tvCount: rankings.filter(r => r.media?.type === 'tv').length,
+        bookCount: rankings.filter(r => r.media?.type === 'book').length,
+        gameCount: rankings.filter(r => r.media?.type === 'game').length,
         avgRating: rankings.length > 0
           ? roundToDecimal(rankings.reduce((sum, r) => sum + r.rank, 0) / rankings.length, 1)
           : 0,

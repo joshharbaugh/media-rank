@@ -3,12 +3,13 @@ import { useAuth } from '@/contexts/Auth';
 import { RankingService } from '@/services/rankingService';
 import { Ranking, Media, UserStats } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
+import { Timestamp } from 'firebase/firestore';
 
 interface UseRankingsReturn {
   rankings: Ranking[];
   loading: boolean;
   error: string | null;
-  addRanking: (media: Media, rank: number, notes?: string) => Promise<void>;
+  addRanking: (rank: number, notes?: string, media?: Media) => Promise<void>;
   updateRanking: (ranking: Ranking) => Promise<void>;
   deleteRanking: (rankingId: string) => Promise<void>;
   checkIfRanked: (mediaId: string) => Promise<{ exists: boolean; ranking?: Ranking }>;
@@ -50,9 +51,9 @@ export const useRankings = (): UseRankingsReturn => {
 
   // Add a new ranking
   const addRanking = useCallback(async (
-    media: Media,
     rank: number,
-    notes?: string
+    notes?: string,
+    media?: Media
   ) => {
     if (!user) throw new Error('User not authenticated');
 
@@ -60,7 +61,7 @@ export const useRankings = (): UseRankingsReturn => {
       // Check if already ranked
       const { exists, ranking: existingRanking } = await RankingService.isMediaRanked(
         user.uid,
-        media.id
+        media?.id || ''
       );
 
       if (exists && existingRanking) {
@@ -68,7 +69,8 @@ export const useRankings = (): UseRankingsReturn => {
         const updatedRanking: Ranking = {
           ...existingRanking,
           rank,
-          notes: notes || existingRanking.notes
+          notes: notes || existingRanking.notes,
+          updatedAt: Timestamp.fromDate(new Date())
         };
         await RankingService.saveRanking(user.uid, updatedRanking);
 
@@ -80,10 +82,11 @@ export const useRankings = (): UseRankingsReturn => {
         // Create new ranking
         const newRanking: Ranking = {
           id: uuidv4(),
-          mediaId: media.id,
+          mediaId: media?.id || '',
           media,
           rank,
-          notes: notes || ''
+          notes: notes || '',
+          createdAt: Timestamp.fromDate(new Date()),
         };
 
         await RankingService.saveRanking(user.uid, newRanking);

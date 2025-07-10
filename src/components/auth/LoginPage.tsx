@@ -66,6 +66,7 @@ export const LoginPage: React.FC = () => {
         setEmail('');
       }
     } catch (err) {
+      console.error('Error submitting form:', err);
       // Error is handled in context
     } finally {
       setIsSubmitting(false);

@@ -23,6 +23,7 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState<TabType>('search');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
+  const [existingRanking, setExistingRanking] = useState<Ranking | null>(null);
 
   // Apply theme class to root
   useEffect(() => {
@@ -43,13 +44,19 @@ function AppContent() {
   };
 
   const handleSaveRanking = (ranking: Ranking) => {
-    addRanking(ranking.media, ranking.rank, ranking.notes);
+    addRanking(ranking.rank, ranking.notes, ranking.media);
     setShowAddModal(false);
     setSelectedMedia(null);
+    setExistingRanking(null);
   };
 
   const handleRemoveRanking = (id: string) => {
     deleteRanking(id);
+  };
+
+  const handleEditRanking = (ranking: Ranking) => {
+    setExistingRanking(ranking);
+    setShowAddModal(true);
   };
 
   return (
@@ -66,6 +73,7 @@ function AppContent() {
           <RankingsTab
             rankings={rankings}
             onRemoveRanking={handleRemoveRanking}
+            onEditRanking={handleEditRanking}
           />
         )}
 
@@ -74,14 +82,16 @@ function AppContent() {
         )}
       </main>
 
-      {showAddModal && selectedMedia && (
+      {showAddModal && (selectedMedia || existingRanking) && (
         <AddRankingModal
-          media={selectedMedia}
+          media={selectedMedia || existingRanking?.media}
           onSave={handleSaveRanking}
           onClose={() => {
             setShowAddModal(false);
             setSelectedMedia(null);
+            setExistingRanking(null);
           }}
+          existingRanking={existingRanking || undefined}
         />
       )}
     </div>
