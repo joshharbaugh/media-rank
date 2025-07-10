@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 import { Header } from '@/components/Header';
 import { Navigation } from '@/components/Navigation';
@@ -15,12 +15,10 @@ import { useThemeStore } from '@/store/themeStore';
 import { AuthProvider } from '@/contexts/Auth';
 import { useRankings } from '@/hooks/useRankings';
 
-type TabType = 'search' | 'rankings' | 'profile';
-
 function AppContent() {
   const { theme } = useThemeStore();
   const { rankings, addRanking, deleteRanking } = useRankings();
-  const [activeTab, setActiveTab] = useState<TabType>('search');
+  const location = useLocation();
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
   const [existingRanking, setExistingRanking] = useState<Ranking | null>(null);
@@ -34,9 +32,17 @@ function AppContent() {
     }
   }, [theme]);
 
-  window.addEventListener('navigate-to-profile', () => {
-    setActiveTab('profile');
-  });
+  // Handle navigation to profile from external events
+  useEffect(() => {
+    const handleNavigateToProfile = () => {
+      window.location.href = '/profile';
+    };
+
+    window.addEventListener('navigate-to-profile', handleNavigateToProfile);
+    return () => {
+      window.removeEventListener('navigate-to-profile', handleNavigateToProfile);
+    };
+  }, []);
 
   const handleAddToRankings = (media: Media) => {
     setSelectedMedia(media);
@@ -59,27 +65,39 @@ function AppContent() {
     setShowAddModal(true);
   };
 
+  // Determine active tab based on current route
+  const getActiveTab = () => {
+    const path = location.pathname;
+    if (path === '/search' || path === '/') return 'search';
+    if (path === '/rankings') return 'rankings';
+    if (path === '/profile') return 'profile';
+    return 'search';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
       <Header />
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <Navigation activeTab={getActiveTab()} />
 
       <main className="max-w-6xl mx-auto px-4 py-8">
-        {activeTab === 'search' && (
-          <SearchTab onAddToRankings={handleAddToRankings} />
-        )}
-
-        {activeTab === 'rankings' && (
-          <RankingsTab
-            rankings={rankings}
-            onRemoveRanking={handleRemoveRanking}
-            onEditRanking={handleEditRanking}
+        <Routes>
+          <Route path="/" element={<SearchTab onAddToRankings={handleAddToRankings} />} />
+          <Route path="/search" element={<SearchTab onAddToRankings={handleAddToRankings} />} />
+          <Route
+            path="/rankings"
+            element={
+              <RankingsTab
+                rankings={rankings}
+                onRemoveRanking={handleRemoveRanking}
+                onEditRanking={handleEditRanking}
+              />
+            }
           />
-        )}
-
-        {activeTab === 'profile' && (
-          <ProfileTab rankings={rankings} />
-        )}
+          <Route
+            path="/profile"
+            element={<ProfileTab rankings={rankings} />}
+          />
+        </Routes>
       </main>
 
       {showAddModal && (selectedMedia || existingRanking) && (
@@ -105,14 +123,13 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route
-            path="/"
+            path="/*"
             element={
               <ProtectedRoute>
                 <AppContent />
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>
