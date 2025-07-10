@@ -67,18 +67,9 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
           {/* Avatar */}
           <div className="relative group">
-            {userProfile?.photoURL ? (
-              <img
-                src={userProfile.photoURL}
-                alt={userProfile.displayName || 'User'}
-                className="w-24 h-24 rounded-full"
-                onError={() => getInitials(userProfile?.displayName || userProfile?.email || null)}
-              />
-            ) : (
-              <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                {getInitials(userProfile?.displayName || userProfile?.email || null)}
-              </div>
-            )}
+            <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+              {getInitials(userProfile?.displayName || userProfile?.email || null)}
+            </div>
             <button title="Change Avatar" className="absolute bottom-0 right-0 p-1.5 bg-white dark:bg-gray-700 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
               <Camera className="w-4 h-4 text-gray-600 dark:text-gray-300" />
             </button>

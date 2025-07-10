@@ -42,18 +42,9 @@ export function UserMenu() {
           onClick={() => setShowUserMenu(!showUserMenu)}
           className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
-          {user?.photoURL ? (
-            <img
-              src={user.photoURL}
-              alt={user.displayName || 'User'}
-              className="w-8 h-8 rounded-full"
-              onError={() => getInitials(user?.displayName || user?.email || null)}
-            />
-          ) : (
-            <div className="w-8 h-8 bg-indigo-600 dark:bg-indigo-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-              {getInitials(user?.displayName || user?.email || null)}
-            </div>
-          )}
+          <div className="w-8 h-8 bg-indigo-600 dark:bg-indigo-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+            {getInitials(user?.displayName || user?.email || null)}
+          </div>
           <ChevronDown className={`w-4 h-4 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
         </button>
 

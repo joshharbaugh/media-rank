@@ -150,7 +150,7 @@ export class RankingService {
           : 0,
         highestRated: rankings.sort((a, b) => b.rank - a.rank)[0],
         lowestRated: rankings.sort((a, b) => a.rank - b.rank)[0],
-        recentRankings: rankings.slice(0, 7),
+        recentRankings: rankings.sort((a, b) => (b.updatedAt?.toDate().getTime() || 0) - (a.updatedAt?.toDate().getTime() || 0)).slice(0, 7),
         ratingDistribution: [],
         mostCommonRating: 0
       };
