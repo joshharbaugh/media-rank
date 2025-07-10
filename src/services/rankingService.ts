@@ -140,6 +140,7 @@ export class RankingService {
 
       const stats: UserStats = {
         total: rankings.length,
+        totalRatings: rankings.reduce((sum, r) => sum + r.rank, 0),
         movieCount: rankings.filter(r => r.media?.type === 'movie').length,
         tvCount: rankings.filter(r => r.media?.type === 'tv').length,
         bookCount: rankings.filter(r => r.media?.type === 'book').length,
@@ -149,8 +150,26 @@ export class RankingService {
           : 0,
         highestRated: rankings.sort((a, b) => b.rank - a.rank)[0],
         lowestRated: rankings.sort((a, b) => a.rank - b.rank)[0],
-        recentRankings: rankings.slice(0, 7)
+        recentRankings: rankings.slice(0, 7),
+        ratingDistribution: [],
+        mostCommonRating: 0
       };
+
+      // Calculate rating distribution
+      const ratingDistribution = [0, 0, 0, 0, 0];
+      rankings.forEach(r => {
+        ratingDistribution[r.rank - 1]++;
+      });
+      stats['ratingDistribution'] = ratingDistribution;
+
+      // Most common rating
+      const mostCommonRatingIndex = ratingDistribution.indexOf(Math.max(...ratingDistribution));
+      const mostCommonRating = mostCommonRatingIndex + 1;
+      stats['mostCommonRating'] = mostCommonRating;
+
+      // Recent activity (last 7 rankings)
+      // const recentRankings = [...rankings].slice(-7).reverse();
+      // stats['recentRankings'] = recentRankings;
 
       return stats;
     } catch (error) {

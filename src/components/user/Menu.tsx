@@ -47,6 +47,7 @@ export function UserMenu() {
               src={user.photoURL}
               alt={user.displayName || 'User'}
               className="w-8 h-8 rounded-full"
+              onError={() => getInitials(user?.displayName || user?.email || null)}
             />
           ) : (
             <div className="w-8 h-8 bg-indigo-600 dark:bg-indigo-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">

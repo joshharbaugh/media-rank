@@ -192,6 +192,7 @@ export interface UserProfile {
 
 export interface UserStats {
   total: number;
+  totalRatings: number;
   movieCount: number;
   tvCount: number;
   bookCount: number;
@@ -200,4 +201,6 @@ export interface UserStats {
   highestRated: Ranking;
   lowestRated: Ranking;
   recentRankings: Ranking[];
+  ratingDistribution: number[];
+  mostCommonRating: number;
 }

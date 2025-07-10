@@ -1,14 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Camera, Edit3, Trophy, Star, TrendingUp,
   Film, Tv, Book, BarChart3, PieChart, Calendar,
-  Award, Sparkles, Gamepad2
+  Award, Sparkles, Gamepad2, Loader2
 } from 'lucide-react';
-import { Ranking } from '@/types';
+import { Ranking, UserStats } from '@/types';
 import { getInitials, getMediaIcon } from '@/utils/helpers';
 import { useUserStore } from '@/store/userStore';
 import { db } from '@/lib/firebase';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useRankings } from '@/hooks/useRankings';
 
 interface ProfileTabProps {
   rankings: Ranking[];
@@ -19,54 +20,20 @@ interface ProfileTabProps {
 // }
 
 export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement => {
+  const { getUserStats } = useRankings();
   const userProfile = useUserStore((state) => state.profile);
   const updateProfile = useUserStore((state) => state.updateProfile);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [tempBio, setTempBio] = useState(userProfile?.bio);
+  const [stats, setStats] = useState<UserStats | null>(null);
 
-  // Calculate comprehensive statistics
-  const stats = useMemo(() => {
-    const movieCount = rankings.filter(r => r.media?.type === 'movie').length;
-    const tvCount = rankings.filter(r => r.media?.type === 'tv').length;
-    const bookCount = rankings.filter(r => r.media?.type === 'book').length;
-    const gameCount = rankings.filter(r => r.media?.type === 'game').length;
-
-    const totalRatings = rankings.reduce((sum, r) => sum + r.rank, 0);
-    const avgRating = rankings.length > 0 ? (totalRatings / rankings.length).toFixed(2) : '0.00';
-
-    // Find highest and lowest rated
-    const sortedByRating = [...rankings].sort((a, b) => b.rank - a.rank);
-    const highestRated = sortedByRating[0];
-    const lowestRated = sortedByRating[sortedByRating.length - 1];
-
-    // Calculate rating distribution
-    const ratingDistribution = [0, 0, 0, 0, 0];
-    rankings.forEach(r => {
-      ratingDistribution[r.rank - 1]++;
-    });
-
-    // Most common rating
-    const mostCommonRatingIndex = ratingDistribution.indexOf(Math.max(...ratingDistribution));
-    const mostCommonRating = mostCommonRatingIndex + 1;
-
-    // Recent activity (last 7 rankings)
-    const recentRankings = [...rankings].slice(-7).reverse();
-
-    return {
-      total: rankings.length,
-      movieCount,
-      tvCount,
-      bookCount,
-      gameCount,
-      avgRating,
-      highestRated,
-      lowestRated,
-      ratingDistribution,
-      mostCommonRating,
-      recentRankings,
-      totalRatings
+  useEffect(() => {
+    const fetchStats = async () => {
+      const userStats = await getUserStats();
+      setStats(userStats);
     };
-  }, [rankings]);
+    fetchStats();
+  }, [getUserStats, rankings]);
 
   const handleSaveBio = async () => {
     if (!userProfile) return;
@@ -86,6 +53,13 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
     setIsEditingBio(false);
   };
 
+  // TODO: Add Skeleton Loader
+  if (!stats) return (
+    <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <Loader2 className="w-8 h-8 animate-spin text-indigo-600 dark:text-indigo-400" />
+    </div>
+  );
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Profile Header */}
@@ -93,10 +67,19 @@ export const ProfileTab = ({ rankings }: ProfileTabProps): React.ReactElement =>
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
           {/* Avatar */}
           <div className="relative group">
-            <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-              {getInitials(userProfile?.displayName || userProfile?.email || null)}
-            </div>
-            <button className="absolute bottom-0 right-0 p-1.5 bg-white dark:bg-gray-700 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+            {userProfile?.photoURL ? (
+              <img
+                src={userProfile.photoURL}
+                alt={userProfile.displayName || 'User'}
+                className="w-24 h-24 rounded-full"
+                onError={() => getInitials(userProfile?.displayName || userProfile?.email || null)}
+              />
+            ) : (
+              <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                {getInitials(userProfile?.displayName || userProfile?.email || null)}
+              </div>
+            )}
+            <button title="Change Avatar" className="absolute bottom-0 right-0 p-1.5 bg-white dark:bg-gray-700 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
               <Camera className="w-4 h-4 text-gray-600 dark:text-gray-300" />
             </button>
           </div>

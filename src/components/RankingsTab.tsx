@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Star, X, Trophy, Film, Tv, Book, Edit2, Gamepad2 } from 'lucide-react';
+import { Star, X, Trophy, Film, Tv, Book, Edit2, Gamepad2, Loader2 } from 'lucide-react';
 import { Ranking, UserStats } from '@/types';
 import { getMediaIcon } from '@/utils/helpers';
 import { useRankings } from '@/hooks/useRankings';
@@ -81,6 +81,13 @@ export const RankingsTab = ({
     onRemoveRanking(id);
     setShowDeleteConfirm(null);
   };
+
+  // TODO: Add Skeleton Loader
+  if (!stats) return (
+    <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <Loader2 className="w-8 h-8 animate-spin text-indigo-600 dark:text-indigo-400" />
+    </div>
+  );
 
   if (rankings.length === 0) {
     return (
