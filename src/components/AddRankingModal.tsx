@@ -29,11 +29,11 @@ const quickNotes = [
   "Worth the hype"
 ];
 
-export const AddRankingModal = ({ 
-  media, 
-  onSave, 
+export const AddRankingModal = ({
+  media,
+  onSave,
   onClose,
-  existingRanking 
+  existingRanking
 }: AddRankingModalProps): React.ReactElement => {
   const [rankValue, setRankValue] = useState(existingRanking?.rank || 3);
   const [notes, setNotes] = useState(existingRanking?.notes || '');
@@ -71,7 +71,7 @@ export const AddRankingModal = ({
       rank: rankValue,
       notes: notes.trim()
     };
-    
+
     // Animate out before saving
     setIsAnimating(false);
     setTimeout(() => {
@@ -94,20 +94,20 @@ export const AddRankingModal = ({
   };
 
   return (
-    <div 
+    <div
       className={`fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 transition-opacity duration-200 ${
         isAnimating ? 'opacity-100' : 'opacity-0'
       }`}
       onClick={handleBackdropClick}
     >
-      <div 
+      <div
         ref={modalRef}
-        className={`bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full transform transition-all duration-200 ${
+        className={`flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-dvh h-full md:h-[90%] transform transition-all duration-200 ${
           isAnimating ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'
         }`}
       >
         {/* Header */}
-        <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex-none p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
               {existingRanking ? 'Edit Ranking' : 'Add to Rankings'}
@@ -120,7 +120,7 @@ export const AddRankingModal = ({
               <X className="w-5 h-5" />
             </button>
           </div>
-          
+
           {/* Media Info */}
           <div className="flex items-center gap-4">
             <img
@@ -148,15 +148,15 @@ export const AddRankingModal = ({
             </div>
           </div>
         </div>
-        
+
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="grow p-6 space-y-6 overflow-y-auto">
           {/* Rating Section */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Your Rating
             </label>
-            
+
             {/* Star Rating */}
             <div className="flex items-center justify-center gap-2 mb-3">
               <div className="flex gap-1">
@@ -179,7 +179,7 @@ export const AddRankingModal = ({
                 ))}
               </div>
             </div>
-            
+
             {/* Rating Description */}
             {ratingInfo && (
               <div className="text-center animate-fade-in">
@@ -190,16 +190,16 @@ export const AddRankingModal = ({
               </div>
             )}
           </div>
-          
+
           {/* Notes Section */}
           <div>
-            <label 
-              htmlFor="notes" 
+            <label
+              htmlFor="notes"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             >
               Notes <span className="text-gray-500">(optional)</span>
             </label>
-            
+
             {/* Quick Notes */}
             <div className="flex flex-wrap gap-2 mb-3">
               {quickNotes.map((note) => (
@@ -212,7 +212,7 @@ export const AddRankingModal = ({
                 </button>
               ))}
             </div>
-            
+
             <textarea
               ref={notesRef}
               id="notes"
@@ -227,7 +227,7 @@ export const AddRankingModal = ({
               {notes.length}/500
             </p>
           </div>
-          
+
           {/* Date Added */}
           <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             <Calendar className="w-4 h-4" />
@@ -236,9 +236,9 @@ export const AddRankingModal = ({
             </span>
           </div>
         </div>
-        
+
         {/* Footer */}
-        <div className="p-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex gap-3">
+        <div className="flex-none p-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex gap-3">
           <button
             onClick={onClose}
             className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
@@ -250,7 +250,7 @@ export const AddRankingModal = ({
             className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
           >
             <Save className="w-4 h-4" />
-            {existingRanking ? 'Update' : 'Add'} Ranking
+            {existingRanking ? 'Update' : 'Add'}
           </button>
         </div>
       </div>
