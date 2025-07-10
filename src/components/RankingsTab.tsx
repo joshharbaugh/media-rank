@@ -1,13 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import * as Select from '@radix-ui/react-select';
 import { Star, X, Trophy, Film, Tv, Book, Edit2, Gamepad2 } from 'lucide-react';
-import { CheckIcon, ChevronDownIcon } from '@radix-ui/react-icons';
-import { Ranking, UserStats } from '@/types';
+import { Ranking, RankingDocument, UserStats } from '@/types';
 import { getMediaIcon } from '@/utils/helpers';
 import { useRankings } from '@/hooks/useRankings';
+import { UISelect } from '@/components/ui/Select';
 
 interface RankingsTabProps {
-  rankings: Ranking[];
+  rankings: RankingDocument[];
   onRemoveRanking: (id: string) => void;
   onEditRanking?: (ranking: Ranking) => void;
 }
@@ -43,9 +42,9 @@ export const RankingsTab = ({
         case 'rank-asc':
           return a.rank - b.rank;
         case 'date-desc':
-          return new Date(b.id).getTime() - new Date(a.id).getTime();
+          return b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime();
         case 'date-asc':
-          return new Date(a.id).getTime() - new Date(b.id).getTime();
+          return a.createdAt.toDate().getTime() - b.createdAt.toDate().getTime();
         case 'title':
           return a.media.title.localeCompare(b.media.title);
         default:
@@ -55,6 +54,14 @@ export const RankingsTab = ({
 
     return filtered;
   }, [rankings, sortBy, filterBy]);
+
+  const sortItems = [
+    { label: 'Highest Rated', value: 'rank-desc' },
+    { label: 'Lowest Rated', value: 'rank-asc' },
+    { label: 'Recently Added', value: 'date-desc' },
+    { label: 'Oldest First', value: 'date-asc' },
+    { label: 'Title A-Z', value: 'title' }
+  ];
 
   // Get user stats
   useEffect(() => {
@@ -204,57 +211,13 @@ export const RankingsTab = ({
         </div>
 
         {/* Sort Dropdown */}
-        <Select.Root
+        <UISelect
+          label="Sort by"
           name="sort-by"
           onValueChange={(value: string) => setSortBy(value as SortOption)}
           value={sortBy}
-        >
-          <Select.Trigger
-            className="flex justify-between items-center min-w-[150px] px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-0 focus:ring-2 focus:ring-indigo-500"
-            aria-label="Sort by"
-          >
-            <Select.Value placeholder="Sort by…" />
-            <Select.Icon className="text-gray-500 dark:text-gray-400">
-              <ChevronDownIcon />
-            </Select.Icon>
-          </Select.Trigger>
-          <Select.Portal>
-            <Select.Content className="overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-              <Select.Viewport className="p-[5px]">
-                <Select.Item value="rank-desc" className="relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-sm font-medium leading-none outline-none hover:bg-gray-300 dark:hover:bg-gray-800">
-                  <Select.ItemText>Highest Rated</Select.ItemText>
-                  <Select.ItemIndicator className="absolute left-0 inline-flex w-[25px] items-center justify-center">
-                    <CheckIcon />
-                  </Select.ItemIndicator>
-                </Select.Item>
-                <Select.Item value="rank-asc" className="relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-sm font-medium leading-none outline-none hover:bg-gray-300 dark:hover:bg-gray-800">
-                  <Select.ItemText>Lowest Rated</Select.ItemText>
-                  <Select.ItemIndicator className="absolute left-0 inline-flex w-[25px] items-center justify-center">
-                    <CheckIcon />
-                  </Select.ItemIndicator>
-                </Select.Item>
-                <Select.Item value="date-desc" className="relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-sm font-medium leading-none outline-none hover:bg-gray-300 dark:hover:bg-gray-800">
-                  <Select.ItemText>Recently Added</Select.ItemText>
-                  <Select.ItemIndicator className="absolute left-0 inline-flex w-[25px] items-center justify-center">
-                    <CheckIcon />
-                  </Select.ItemIndicator>
-                </Select.Item>
-                <Select.Item value="date-asc" className="relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-sm font-medium leading-none outline-none hover:bg-gray-300 dark:hover:bg-gray-800">
-                  <Select.ItemText>Oldest First</Select.ItemText>
-                  <Select.ItemIndicator className="absolute left-0 inline-flex w-[25px] items-center justify-center">
-                    <CheckIcon />
-                  </Select.ItemIndicator>
-                </Select.Item>
-                <Select.Item value="title" className="relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-sm font-medium leading-none outline-none hover:bg-gray-300 dark:hover:bg-gray-800">
-                  <Select.ItemText>Title A-Z</Select.ItemText>
-                  <Select.ItemIndicator className="absolute left-0 inline-flex w-[25px] items-center justify-center">
-                    <CheckIcon />
-                  </Select.ItemIndicator>
-                </Select.Item>
-              </Select.Viewport>
-            </Select.Content>
-          </Select.Portal>
-        </Select.Root>
+          items={sortItems}
+        />
       </div>
 
       {/* Rankings List */}
