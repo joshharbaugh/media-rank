@@ -31,8 +31,9 @@ export const UISelect = ({ label, name, onValueChange, value, items }: UISelectP
       <Select.Portal>
         <Select.Content className="overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
           <Select.Viewport className="p-[5px]">
-            {items && items.map((item) => (
+            {items && items.map((item, idx) => (
               <Select.Item
+                key={idx}
                 value={item.value}
                 className="relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-sm font-medium leading-none outline-none hover:bg-gray-300 dark:hover:bg-gray-800"
               >

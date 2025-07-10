@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Star, X, Trophy, Film, Tv, Book, Edit2, Gamepad2 } from 'lucide-react';
-import { Ranking, RankingDocument, UserStats } from '@/types';
+import { Ranking, UserStats } from '@/types';
 import { getMediaIcon } from '@/utils/helpers';
 import { useRankings } from '@/hooks/useRankings';
 import { UISelect } from '@/components/ui/Select';
 
 interface RankingsTabProps {
-  rankings: RankingDocument[];
+  rankings: Ranking[];
   onRemoveRanking: (id: string) => void;
   onEditRanking?: (ranking: Ranking) => void;
 }
@@ -42,9 +42,9 @@ export const RankingsTab = ({
         case 'rank-asc':
           return a.rank - b.rank;
         case 'date-desc':
-          return b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime();
+          return (b.createdAt?.toDate().getTime() ?? 0) - (a.createdAt?.toDate().getTime() ?? 0);
         case 'date-asc':
-          return a.createdAt.toDate().getTime() - b.createdAt.toDate().getTime();
+          return (a.createdAt?.toDate().getTime() ?? 0) - (b.createdAt?.toDate().getTime() ?? 0);
         case 'title':
           return a.media.title.localeCompare(b.media.title);
         default:

@@ -43,14 +43,12 @@ function AppContent() {
   };
 
   const handleSaveRanking = (ranking: Ranking) => {
-    // setRankings([...rankings, ranking]); // TODO: Remove this
     addRanking(ranking.media, ranking.rank, ranking.notes);
     setShowAddModal(false);
     setSelectedMedia(null);
   };
 
   const handleRemoveRanking = (id: string) => {
-    // setRankings(rankings.filter(r => r.id !== id)); // TODO: Remove this
     deleteRanking(id);
   };
 

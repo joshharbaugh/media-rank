@@ -174,12 +174,9 @@ export interface Ranking {
   media: Media;
   rank: number;
   notes?: string;
-}
-
-export interface RankingDocument extends Ranking {
-  userId: string;
-  createdAt: Timestamp; // Firestore Timestamp
-  updatedAt: Timestamp; // Firestore Timestamp
+  userId?: string;
+  createdAt?: Timestamp; // Firestore Timestamp
+  updatedAt?: Timestamp; // Firestore Timestamp
 }
 
 export interface UserProfile {
