@@ -14,14 +14,14 @@ export const searchBooks = async (query: string) => {
 
 export const searchMovies = async (query: string) => {
   const response = await fetch(
-    `${MOVIES_API_BASE_URL}/search/movie?api_key=${MOVIES_API_KEY}&query=${query}`
+    `${MOVIES_API_BASE_URL}/search/movie?api_key=${MOVIES_API_KEY}&query=${query}&region=US`
   );
   return response.json();
 };
 
 export const searchShows = async (query: string) => {
   const response = await fetch(
-    `${MOVIES_API_BASE_URL}/search/tv?api_key=${MOVIES_API_KEY}&query=${query}`
+    `${MOVIES_API_BASE_URL}/search/tv?api_key=${MOVIES_API_KEY}&query=${query}&region=US`
   );
   return response.json();
 };

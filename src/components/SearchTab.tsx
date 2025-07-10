@@ -32,7 +32,8 @@ export const SearchTab = ({ onAddToRankings }: SearchTabProps): React.ReactEleme
     if (mediaType === 'movie') {
       const response: SearchResultsMovies = await searchMovies(searchQuery);
       const filteredResults = response.results.filter(movie =>
-        movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+        movie.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        movie.original_language?.toLowerCase() === 'en'
       );
 
       setSearchResults(
