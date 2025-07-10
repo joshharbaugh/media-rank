@@ -83,9 +83,13 @@ export const useSearch = () => {
       );
     }
 
-    setIsLoading(false);
+    // TODO: Implement music search
+    if (mediaType === 'music') {
+      // const response: SearchResultsMusic = await searchMusic(query);
+      // setSearchResults(response.results);
+    }
 
-    return;
+    setIsLoading(false);
   }
 
   return {

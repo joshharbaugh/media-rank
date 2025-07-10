@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 
-export type MediaType = 'movie' | 'tv' | 'book' | 'game';
+export type MediaType = 'movie' | 'tv' | 'book' | 'game' | 'music';
 
 export interface Media {
   id: string;

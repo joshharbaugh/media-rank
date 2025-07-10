@@ -32,3 +32,11 @@ export const searchGames = async (query: string) => {
   );
   return response.json();
 };
+
+// TODO: Implement music search
+export const searchMusic = async () => {
+  // const response = await fetch(
+  //   `/api/music?query=${encodeURIComponent(query)}`
+  // );
+  // return response.json();
+};
