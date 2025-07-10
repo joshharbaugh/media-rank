@@ -36,3 +36,8 @@ export const formatDate = (date?: string) => {
   if (!date) return '';
   return new Date(date).getFullYear().toString();
 };
+
+export const roundToDecimal = (num: number, decimalPlaces: number) => {
+  const factor = Math.pow(10, decimalPlaces);
+  return Math.round(num * factor) / factor;
+};

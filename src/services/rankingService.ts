@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Ranking, UserStats } from '@/types';
+import { roundToDecimal } from '@/utils/helpers';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface RankingDocument extends Omit<Ranking, 'id'> {
@@ -138,7 +139,7 @@ export class RankingService {
         bookCount: rankings.filter(r => r.media.type === 'book').length,
         gameCount: rankings.filter(r => r.media.type === 'game').length,
         avgRating: rankings.length > 0
-          ? rankings.reduce((sum, r) => sum + r.rank, 0) / rankings.length
+          ? roundToDecimal(rankings.reduce((sum, r) => sum + r.rank, 0) / rankings.length, 1)
           : 0,
         highestRated: rankings.sort((a, b) => b.rank - a.rank)[0],
         lowestRated: rankings.sort((a, b) => a.rank - b.rank)[0],

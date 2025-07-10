@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import * as Select from '@radix-ui/react-select';
 import { Star, X, Trophy, Film, Tv, Book, Edit2, Gamepad2 } from 'lucide-react';
+import { CheckIcon, ChevronDownIcon } from '@radix-ui/react-icons';
 import { Ranking, UserStats } from '@/types';
 import { getMediaIcon } from '@/utils/helpers';
 import { useRankings } from '@/hooks/useRankings';
@@ -149,7 +151,7 @@ export const RankingsTab = ({
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
             }`}
           >
-            All ({rankings.length})
+            All
           </button>
           <button
             onClick={() => setFilterBy('movie')}
@@ -189,7 +191,7 @@ export const RankingsTab = ({
           </button>
           <button
             onClick={() => setFilterBy('game')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+            className={`pl-3 pr-4 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
               filterBy === 'game'
                 ? 'bg-indigo-600 text-white'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
@@ -202,17 +204,57 @@ export const RankingsTab = ({
         </div>
 
         {/* Sort Dropdown */}
-        <select
+        <Select.Root
+          name="sort-by"
+          onValueChange={(value: string) => setSortBy(value as SortOption)}
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as SortOption)}
-          className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-0 focus:ring-2 focus:ring-indigo-500"
         >
-          <option value="rank-desc">Highest Rated</option>
-          <option value="rank-asc">Lowest Rated</option>
-          <option value="date-desc">Recently Added</option>
-          <option value="date-asc">Oldest First</option>
-          <option value="title">Title A-Z</option>
-        </select>
+          <Select.Trigger
+            className="flex justify-between items-center min-w-[150px] px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-0 focus:ring-2 focus:ring-indigo-500"
+            aria-label="Sort by"
+          >
+            <Select.Value placeholder="Sort by…" />
+            <Select.Icon className="text-gray-500 dark:text-gray-400">
+              <ChevronDownIcon />
+            </Select.Icon>
+          </Select.Trigger>
+          <Select.Portal>
+            <Select.Content className="overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+              <Select.Viewport className="p-[5px]">
+                <Select.Item value="rank-desc" className="relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-sm font-medium leading-none outline-none hover:bg-gray-300 dark:hover:bg-gray-800">
+                  <Select.ItemText>Highest Rated</Select.ItemText>
+                  <Select.ItemIndicator className="absolute left-0 inline-flex w-[25px] items-center justify-center">
+                    <CheckIcon />
+                  </Select.ItemIndicator>
+                </Select.Item>
+                <Select.Item value="rank-asc" className="relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-sm font-medium leading-none outline-none hover:bg-gray-300 dark:hover:bg-gray-800">
+                  <Select.ItemText>Lowest Rated</Select.ItemText>
+                  <Select.ItemIndicator className="absolute left-0 inline-flex w-[25px] items-center justify-center">
+                    <CheckIcon />
+                  </Select.ItemIndicator>
+                </Select.Item>
+                <Select.Item value="date-desc" className="relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-sm font-medium leading-none outline-none hover:bg-gray-300 dark:hover:bg-gray-800">
+                  <Select.ItemText>Recently Added</Select.ItemText>
+                  <Select.ItemIndicator className="absolute left-0 inline-flex w-[25px] items-center justify-center">
+                    <CheckIcon />
+                  </Select.ItemIndicator>
+                </Select.Item>
+                <Select.Item value="date-asc" className="relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-sm font-medium leading-none outline-none hover:bg-gray-300 dark:hover:bg-gray-800">
+                  <Select.ItemText>Oldest First</Select.ItemText>
+                  <Select.ItemIndicator className="absolute left-0 inline-flex w-[25px] items-center justify-center">
+                    <CheckIcon />
+                  </Select.ItemIndicator>
+                </Select.Item>
+                <Select.Item value="title" className="relative flex h-[25px] select-none items-center rounded-[3px] pl-[25px] pr-[35px] text-sm font-medium leading-none outline-none hover:bg-gray-300 dark:hover:bg-gray-800">
+                  <Select.ItemText>Title A-Z</Select.ItemText>
+                  <Select.ItemIndicator className="absolute left-0 inline-flex w-[25px] items-center justify-center">
+                    <CheckIcon />
+                  </Select.ItemIndicator>
+                </Select.Item>
+              </Select.Viewport>
+            </Select.Content>
+          </Select.Portal>
+        </Select.Root>
       </div>
 
       {/* Rankings List */}
@@ -241,7 +283,7 @@ export const RankingsTab = ({
                 {/* Poster */}
                 <img
                   src={ranking.media.poster}
-                  alt={ranking.media.title}
+                  alt=''
                   className="w-16 h-24 sm:w-20 sm:h-30 object-cover rounded shadow-sm"
                 />
 
@@ -250,7 +292,7 @@ export const RankingsTab = ({
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                        <span className="truncate">{ranking.media.title}</span>
+                        <span className="text-ellipsis line-clamp-1">{ranking.media.title}</span>
                         <Icon className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                       </h3>
 

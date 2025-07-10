@@ -152,8 +152,8 @@ export const SearchTab = ({ onAddToRankings }: SearchTabProps): React.ReactEleme
             }`}
           >
             {getMediaIcon(type)}
-            <span className="capitalize">
-              {type === 'tv' ? 'TV Shows' : `${type}s`}
+            <span className="hidden md:block capitalize">
+              {type === 'tv' ? 'TV' : `${type}s`}
             </span>
           </button>
         ))}
