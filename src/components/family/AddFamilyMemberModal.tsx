@@ -20,8 +20,9 @@ export const AddFamilyMemberModal: React.FC<AddFamilyMemberModalProps> = ({
   const { addFamilyMember, clearError, currentFamily, loading, error } = useFamilyStore();
   const { users, loading: usersLoading, error: usersError, fetchUsersByName } = useUserStore();
   const [userId, setUserId] = useState('');
-  const [role, setRole] = useState('');
+  const [role] = useState<FamilyRole>('other');
   const [search, setSearch] = useState('');
+  console.log('AddFamilyMemberModal', currentUserId);
 
   // Search for users
   useEffect(() => {
