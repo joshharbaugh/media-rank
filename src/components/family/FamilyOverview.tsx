@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Users, Settings, Plus, User } from 'lucide-react';
 import { Family, FamilyMember, FamilyRole } from '@/types/family';
 import { useFamilyStore } from '@/store/familyStore';
+import { UpdateFamilyModal } from '@/components/family/UpdateFamilyModal';
 
 interface FamilyOverviewProps {
   family: Family;
@@ -57,9 +58,11 @@ const getRoleLabel = (role: FamilyRole) => {
 
 export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentUserId }) => {
 
-  const isCreator = family.createdBy === currentUserId;
-  const isParent = family.memberIds.includes(currentUserId); // TODO
   const { familyMembers, fetchFamilyMembersWithDetails } = useFamilyStore();
+  const [showUpdateFamilyModal, setShowUpdateFamilyModal] = useState(false);
+
+  const isCreator = family.createdBy === currentUserId;
+  const isParent = familyMembers.some(member => member.userId === currentUserId && member.role === 'parent');
   console.log('[FamilyOverview] familyMembers', familyMembers);
 
   useEffect(() => {
@@ -68,6 +71,13 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentU
 
   return (
     <div className="space-y-6">
+      {/* Update Family Modal */}
+      <UpdateFamilyModal
+        isOpen={showUpdateFamilyModal}
+        onClose={() => setShowUpdateFamilyModal(false)}
+        onSuccess={() => setShowUpdateFamilyModal(false)}
+      />
+
       {/* Family Header */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="flex items-start justify-between">
@@ -90,11 +100,11 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentU
 
           <div className="flex items-center gap-2">
             {(isCreator || isParent) && (
-              <button title="Not implemented" className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
+              <button onClick={() => setShowUpdateFamilyModal(true)} title="Update Family Settings" className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
                 <Settings className="w-5 h-5" />
               </button>
             )}
-            <button title="Not implemented" className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
+            <button title="Add Family Member" className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
               <Plus className="w-5 h-5" />
             </button>
           </div>
