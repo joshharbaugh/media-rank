@@ -63,7 +63,6 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentU
 
   const isCreator = family.createdBy === currentUserId;
   const isParent = familyMembers.some(member => member.userId === currentUserId && member.role === 'parent');
-  console.log('[FamilyOverview] familyMembers', familyMembers);
 
   useEffect(() => {
     if (family.id) fetchFamilyMembersWithDetails(family.id);
@@ -73,8 +72,10 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentU
     <div className="space-y-6">
       {/* Update Family Modal */}
       <UpdateFamilyModal
+        currentUserId={currentUserId}
         isOpen={showUpdateFamilyModal}
         onClose={() => setShowUpdateFamilyModal(false)}
+        onDelete={() => setShowUpdateFamilyModal(false)}
         onSuccess={() => setShowUpdateFamilyModal(false)}
       />
 

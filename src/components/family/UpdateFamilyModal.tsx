@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
-import { X, Users, Save, Loader2 } from 'lucide-react';
+import { X, Users, Save, Loader2, Trash } from 'lucide-react';
 import { useFamilyStore } from '@/store/familyStore';
 
 interface UpdateFamilyModalProps {
+  currentUserId: string;
   isOpen: boolean;
   onClose: () => void;
+  onDelete?: () => void;
   onSuccess?: () => void;
 }
 
 export const UpdateFamilyModal: React.FC<UpdateFamilyModalProps> = ({
+  currentUserId,
   isOpen,
   onClose,
+  onDelete,
   onSuccess
 }) => {
-  const { updateFamily, clearError, currentFamily, loading, error } = useFamilyStore();
+  const { deleteFamily, updateFamily, clearError, currentFamily, loading, error } = useFamilyStore();
   const [name, setName] = useState(currentFamily?.name || '');
   const [description, setDescription] = useState(currentFamily?.description || '');
 
@@ -31,6 +35,20 @@ export const UpdateFamilyModal: React.FC<UpdateFamilyModalProps> = ({
     } catch {
       // Error is handled by the store
     }
+  };
+
+  const handleDelete = async () => {
+    if (!currentFamily?.id || !currentFamily.createdBy) return;
+
+    // Show a confirmation modal before deleting the family
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this family? This action cannot be undone."
+    );
+    if (!confirmed) return;
+
+    await deleteFamily(currentFamily.id, currentFamily.createdBy);
+    handleClose();
+    onDelete?.();
   };
 
   const handleClose = () => {
@@ -110,15 +128,15 @@ export const UpdateFamilyModal: React.FC<UpdateFamilyModalProps> = ({
         </form>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
-          <button
+        <div className="flex items-center justify-between gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+          {currentUserId === currentFamily?.createdBy && <button
             type="button"
-            onClick={handleClose}
-            className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-            disabled={loading}
+            onClick={handleDelete}
+            className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 transition-colors rounded-lg flex items-center gap-2"
           >
-            Cancel
-          </button>
+            <Trash className="w-4 h-4" />
+            Delete
+          </button>}
           <button
             type="submit"
             onClick={handleSubmit}
