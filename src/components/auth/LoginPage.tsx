@@ -94,8 +94,10 @@ export const LoginPage: React.FC = () => {
         {/* Logo/Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">
-            MediaRank
+            FamRank
           </h1>
+          <p className="text-sm italic text-gray-500 dark:text-gray-400 mb-8">Your family's entertainment story</p>
+          <hr className="border-gray-200 dark:border-gray-700 mb-8" />
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
             {mode === 'login' && 'Welcome back'}
             {mode === 'signup' && 'Create your account'}
