@@ -3,6 +3,7 @@ import { Users, Settings, Plus, User } from 'lucide-react';
 import { Family, FamilyMember, FamilyRole } from '@/types/family';
 import { useFamilyStore } from '@/store/familyStore';
 import { UpdateFamilyModal } from '@/components/family/UpdateFamilyModal';
+import { AddFamilyMemberModal } from '@/components/family/AddFamilyMemberModal';
 
 interface FamilyOverviewProps {
   family: Family;
@@ -60,6 +61,7 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentU
 
   const { familyMembers, fetchFamilyMembersWithDetails } = useFamilyStore();
   const [showUpdateFamilyModal, setShowUpdateFamilyModal] = useState(false);
+  const [showAddFamilyMemberModal, setShowAddFamilyMemberModal] = useState(false);
 
   const isCreator = family.createdBy === currentUserId;
   const isParent = familyMembers.some(member => member.userId === currentUserId && member.role === 'parent');
@@ -77,6 +79,14 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentU
         onClose={() => setShowUpdateFamilyModal(false)}
         onDelete={() => setShowUpdateFamilyModal(false)}
         onSuccess={() => setShowUpdateFamilyModal(false)}
+      />
+
+      {/* Add Family Member Modal */}
+      <AddFamilyMemberModal
+        currentUserId={currentUserId}
+        isOpen={showAddFamilyMemberModal}
+        onClose={() => setShowAddFamilyMemberModal(false)}
+        onSuccess={() => setShowAddFamilyMemberModal(false)}
       />
 
       {/* Family Header */}
@@ -101,11 +111,19 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentU
 
           <div className="flex items-center gap-2">
             {(isCreator || isParent) && (
-              <button onClick={() => setShowUpdateFamilyModal(true)} title="Update Family Settings" className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
+              <button
+                onClick={() => setShowUpdateFamilyModal(true)}
+                title="Update Family"
+                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+              >
                 <Settings className="w-5 h-5" />
               </button>
             )}
-            <button title="Add Family Member" className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
+            <button
+              onClick={() => setShowAddFamilyMemberModal(true)}
+              title="Add Family Member"
+              className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+            >
               <Plus className="w-5 h-5" />
             </button>
           </div>
