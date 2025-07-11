@@ -301,7 +301,7 @@ export const RankingsView = ({
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-1">
+                    <div className="flex flex-col md:flex-row items-center gap-1">
                       {onEditRanking && (
                         <button
                           onClick={() => onEditRanking(ranking)}

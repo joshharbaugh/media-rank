@@ -1,4 +1,4 @@
-# Media Ranking App
+# FamRank: Your family's entertainment story
 
 A modern web application for discovering, ranking, and organizing your favorite media across multiple categories including movies, TV shows, books, and video games.
 
@@ -118,8 +118,12 @@ Outlines improvements that are on the roadmap for future releases. These updates
 1. Music (track, albums, artist) search and Rankings
 2. Drag & Drop ranking changes (move rankings around manually)
 3. Family Profiles
-4. User settings
-5. Unit & Integration Tests
+4. Family Challenges: "Let's all watch and rate a classic this week!"
+5. Shared Watchlists: Planning movie nights together
+6. Memory Lane: "Remember when we watched this together?"
+7. Family Stats: "The Johnson family's favorite genre is..."
+8. User settings
+9. Unit & Integration Tests
 
 ## License
 
