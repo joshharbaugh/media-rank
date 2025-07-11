@@ -11,7 +11,8 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Ranking, UserStats } from '@/types';
+import { Ranking } from '@/types';
+import { UserStats } from '@/types/user';
 import { roundToDecimal } from '@/utils/helpers';
 import { v4 as uuidv4 } from 'uuid';
 

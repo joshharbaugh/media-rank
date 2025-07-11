@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Family, FamilyMember, FamilyMemberRole, FamilyRole } from '@/types';
+import { Family, FamilyMember, FamilyMemberRole, FamilyRole } from '@/types/family';
 import { FamilyService } from '@/services/familyService';
 import { useUserStore } from '@/store/userStore';
 

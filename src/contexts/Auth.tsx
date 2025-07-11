@@ -12,7 +12,7 @@ import {
 import { auth, googleProvider, db } from '@/lib/firebase';
 import { doc, setDoc, getDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { useUserStore } from '@/store/userStore';
-import { UserProfile } from '@/types';
+import { UserProfile } from '@/types/user';
 import { useThemeStore } from '@/store/themeStore';
 
 interface AuthContextType {

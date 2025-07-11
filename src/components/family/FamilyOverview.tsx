@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Users, Settings, Plus, User } from 'lucide-react';
-import { Family, FamilyMember, FamilyRole } from '@/types';
+import { Family, FamilyMember, FamilyRole } from '@/types/family';
 import { useFamilyStore } from '@/store/familyStore';
 
 interface FamilyOverviewProps {

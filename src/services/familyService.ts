@@ -12,7 +12,8 @@ import {
   writeBatch
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Family, FamilyMemberRole, FamilyRole, UserProfile } from '@/types';
+import { Family, FamilyMemberRole, FamilyRole } from '@/types/family';
+import { UserProfile } from '@/types/user';
 import { v4 as uuidv4 } from 'uuid';
 
 export class FamilyService {
