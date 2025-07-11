@@ -1,8 +1,8 @@
 import React from 'react';
-import { Search, Trophy, User } from 'lucide-react';
+import { Search, Trophy, User, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-type TabType = 'search' | 'rankings' | 'profile';
+type TabType = 'search' | 'rankings' | 'profile' | 'family';
 
 interface NavigationProps {
   activeTab: TabType;
@@ -21,6 +21,7 @@ export const Navigation = ({ activeTab }: NavigationProps): React.ReactElement =
   const navItems: NavItem[] = [
     { id: 'search', label: 'Search', icon: <Search className="w-4 h-4" />, path: '/search' },
     { id: 'rankings', label: 'Rankings', icon: <Trophy className="w-4 h-4" />, path: '/rankings' },
+    { id: 'family', label: 'Family', icon: <Users className="w-4 h-4" />, path: '/family' },
     { id: 'profile', label: 'Profile', icon: <User className="w-4 h-4" />, path: '/profile' },
   ];
 

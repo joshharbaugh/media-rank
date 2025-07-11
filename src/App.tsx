@@ -6,6 +6,7 @@ import { Navigation } from '@/components/Navigation';
 import { SearchView } from '@/views/Search';
 import { RankingsView } from '@/views/Rankings';
 import { ProfileView } from '@/views/Profile';
+import { FamilyView } from '@/views/Family';
 import { AddRankingModal } from '@/components/AddRankingModal';
 import { LoginPage } from '@/components/auth/LoginPage';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -70,6 +71,7 @@ function AppContent() {
     const path = location.pathname;
     if (path === '/search' || path === '/') return 'search';
     if (path === '/rankings') return 'rankings';
+    if (path === '/family') return 'family';
     if (path === '/profile') return 'profile';
     return 'search';
   };
@@ -96,6 +98,10 @@ function AppContent() {
           <Route
             path="/profile"
             element={<ProfileView rankings={rankings} />}
+          />
+          <Route
+            path="/family"
+            element={<FamilyView />}
           />
         </Routes>
       </main>

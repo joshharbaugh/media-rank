@@ -179,6 +179,32 @@ export interface Ranking {
   updatedAt?: Timestamp; // Firestore Timestamp
 }
 
+export type FamilyRole = 'parent' | 'guardian' | 'child' | 'grandmother' | 'grandfather' | 'aunt' | 'uncle' | 'cousin' | 'sibling' | 'other';
+
+export interface FamilyMember {
+  userId: string;
+  role: FamilyRole;
+  displayName: string;
+  photoURL?: string | null;
+  joinedAt: Timestamp;
+  isActive: boolean;
+}
+
+export interface Family {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+  createdBy: string; // userId of the family creator
+  members: FamilyMember[];
+  settings: {
+    allowChildRankings: boolean;
+    requireParentApproval: boolean;
+    privacyLevel: 'private' | 'family-only' | 'public';
+  };
+}
+
 export interface UserProfile {
   uid: string;
   email: string | null;
@@ -190,6 +216,11 @@ export interface UserProfile {
   updatedAt: Timestamp; // Firestore Timestamp
   settings: {
     theme: 'light' | 'dark';
+  };
+  family?: {
+    familyId: string;
+    role: FamilyRole;
+    joinedAt?: Timestamp;
   };
 }
 
