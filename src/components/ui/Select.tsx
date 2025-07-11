@@ -12,7 +12,7 @@ interface UISelectProps {
   onValueChange: (value: string) => void
 }
 
-export const UISelect = ({ label, name, onValueChange, value, items }: UISelectProps) => {
+function UISelect({ label, name, onValueChange, value, items }: UISelectProps) {
   return (
     <Select.Root
       name={name}
@@ -49,3 +49,5 @@ export const UISelect = ({ label, name, onValueChange, value, items }: UISelectP
     </Select.Root>
   );
 };
+
+export default UISelect;

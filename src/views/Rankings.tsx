@@ -3,7 +3,7 @@ import { Star, X, Trophy, Film, Tv, Book, Edit2, Gamepad2, Loader2 } from 'lucid
 import { Ranking, UserStats } from '@/types';
 import { getMediaIcon } from '@/utils/helpers';
 import { useRankings } from '@/hooks/useRankings';
-import { UISelect } from '@/components/ui/Select';
+import UISelect from '@/components/ui/Select';
 
 interface RankingsTabProps {
   rankings: Ranking[];

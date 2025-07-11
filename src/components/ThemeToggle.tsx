@@ -1,12 +1,16 @@
 import React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useThemeStore } from '@/store/themeStore';
+import { useUserStore } from '@/store/userStore';
 
 export const ThemeToggle = (): React.ReactNode => {
   const { theme, toggleTheme } = useThemeStore();
+  const { updateProfile } = useUserStore();
 
+  // Update user profile with new theme
   function handleToggleTheme() {
     toggleTheme();
+    updateProfile({ settings: { theme: theme === 'light' ? 'dark' : 'light' } });
   }
 
   return (

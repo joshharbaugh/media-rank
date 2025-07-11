@@ -188,6 +188,9 @@ export interface UserProfile {
   favoriteGenres: string[];
   createdAt: Timestamp; // Firestore Timestamp
   updatedAt: Timestamp; // Firestore Timestamp
+  settings: {
+    theme: 'light' | 'dark';
+  };
 }
 
 export interface UserStats {

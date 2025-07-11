@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/Auth';
 import { Loader2 } from 'lucide-react';
+import { useThemeStore } from '@/store/themeStore';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,6 +11,16 @@ interface ProtectedRouteProps {
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const { theme } = useThemeStore();
+
+  // Apply theme class to root
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   if (loading) {
     return (

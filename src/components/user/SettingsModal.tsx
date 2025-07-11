@@ -1,5 +1,6 @@
-import { X, Save } from 'lucide-react';
+import { X, Save, Moon, Sun } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
+import { useThemeStore } from '@/store/themeStore';
 
 interface UserSettingsModalProps {
   onSave: () => void;
@@ -12,6 +13,7 @@ export const UserSettingsModal = ({
 }: UserSettingsModalProps): React.ReactElement => {
   const [isAnimating, setIsAnimating] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
+  const { theme } = useThemeStore();
 
   useEffect(() => {
     // Focus trap

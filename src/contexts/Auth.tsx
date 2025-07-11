@@ -13,6 +13,7 @@ import { auth, googleProvider, db } from '@/lib/firebase';
 import { doc, setDoc, getDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { useUserStore } from '@/store/userStore';
 import { UserProfile } from '@/types';
+import { useThemeStore } from '@/store/themeStore';
 
 interface AuthContextType {
   user: User | null;
@@ -42,6 +43,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const { theme } = useThemeStore();
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
   const setProfile = useUserStore((state) => state.setProfile);
@@ -63,14 +65,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         bio: '',
         favoriteGenres: [],
         createdAt: serverTimestamp() as Timestamp,
-        updatedAt: serverTimestamp() as Timestamp
+        updatedAt: serverTimestamp() as Timestamp,
+        settings: {
+          theme
+        }
       }
       await setDoc(userRef, profile);
       setProfile(profile);
     } else {
       // Update last login
       await setDoc(userRef, {
-        updatedAt: serverTimestamp() as Timestamp
+        updatedAt: serverTimestamp() as Timestamp,
+        settings: {
+          theme
+        }
       }, { merge: true });
       setProfile(userSnap.data() as UserProfile);
     }
