@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Users, Settings, Plus, User } from 'lucide-react';
-import { Family, FamilyRole } from '@/types';
+import { Family, FamilyMember, FamilyRole } from '@/types';
+import { useFamilyStore } from '@/store/familyStore';
 
 interface FamilyOverviewProps {
   family: Family;
@@ -56,9 +57,14 @@ const getRoleLabel = (role: FamilyRole) => {
 
 export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentUserId }) => {
 
-  const currentUserMember = family.members.find(m => m.userId === currentUserId);
   const isCreator = family.createdBy === currentUserId;
-  const isParent = currentUserMember?.role === 'parent' || currentUserMember?.role === 'guardian';
+  const isParent = family.memberIds.includes(currentUserId); // TODO
+  const { familyMembers, fetchFamilyMembersWithDetails } = useFamilyStore();
+  console.log('[FamilyOverview] familyMembers', familyMembers);
+
+  useEffect(() => {
+    if (family.id) fetchFamilyMembersWithDetails(family.id);
+  }, [family.id, fetchFamilyMembersWithDetails]);
 
   return (
     <div className="space-y-6">
@@ -76,7 +82,7 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentU
               </p>
             )}
             <div className="flex items-center gap-4 mt-4 text-sm text-gray-500 dark:text-gray-400">
-              <span>{family.members.length} members</span>
+              <span>{family.memberIds.length} members</span>
               <span>•</span>
               <span>Created {family.createdAt?.toDate?.() ? family.createdAt.toDate().toLocaleDateString() : 'Recently'}</span>
             </div>
@@ -84,11 +90,11 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentU
 
           <div className="flex items-center gap-2">
             {(isCreator || isParent) && (
-              <button className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
+              <button title="Not implemented" className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
                 <Settings className="w-5 h-5" />
               </button>
             )}
-            <button className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
+            <button title="Not implemented" className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
               <Plus className="w-5 h-5" />
             </button>
           </div>
@@ -102,7 +108,7 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentU
         </h3>
 
         <div className="grid gap-4">
-          {family.members.map((member) => (
+          {familyMembers.map((member: FamilyMember) => (
             <div
               key={member.userId}
               className={`flex items-center gap-4 p-4 rounded-lg border ${

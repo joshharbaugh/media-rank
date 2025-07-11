@@ -12,9 +12,17 @@ export const FamilyView: React.FC = () => {
 
   useEffect(() => {
     if (user?.uid) {
+      console.log('fetching families for user', user.uid);
       fetchUserFamilies(user.uid);
     }
   }, [user?.uid, fetchUserFamilies]);
+
+  useEffect(() => {
+    // If there is only one family, set it as the current family
+    if (families && families.length === 1) {
+      setCurrentFamily(families[0]);
+    }
+  }, [families, setCurrentFamily]);
 
   const handleCreateSuccess = () => {
     // The store will automatically update with the new family
@@ -112,7 +120,7 @@ export const FamilyView: React.FC = () => {
                   {family.name}
                 </h4>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {family.members.length} members
+                  {family.memberIds.length} members
                 </p>
                 {family.description && (
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">

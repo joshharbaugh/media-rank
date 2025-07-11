@@ -1,19 +1,18 @@
 import {
   collection,
   doc,
-  setDoc,
   getDoc,
   getDocs,
   updateDoc,
-  deleteDoc,
   query,
   where,
   orderBy,
   serverTimestamp,
-  Timestamp
+  Timestamp,
+  writeBatch
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Family, FamilyMember, FamilyRole } from '@/types';
+import { Family, FamilyMemberRole, FamilyRole, UserProfile } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 export class FamilyService {
@@ -25,6 +24,14 @@ export class FamilyService {
     return doc(db, 'families', familyId);
   }
 
+  private static getFamilyMemberRolesRef() {
+    return collection(db, 'familyMemberRoles');
+  }
+
+  private static getFamilyMemberRoleRef(familyId: string, userId: string) {
+    return doc(db, 'familyMemberRoles', `${familyId}_${userId}`);
+  }
+
   // Create a new family
   static async createFamily(
     creatorId: string,
@@ -33,19 +40,16 @@ export class FamilyService {
   ): Promise<Family> {
     try {
       const familyId = uuidv4();
+      const batch = writeBatch(db);
+
+      // Create the family document
       const family: Family = {
         id: familyId,
         name,
         description,
         createdAt: serverTimestamp() as Timestamp,
         createdBy: creatorId,
-        members: [{
-          userId: creatorId,
-          role: 'parent',
-          displayName: 'Creator', // Will be updated with actual user data
-          joinedAt: Timestamp.now(),
-          isActive: true
-        }],
+        memberIds: [creatorId], // Start with just the creator
         settings: {
           allowChildRankings: true,
           requireParentApproval: false,
@@ -53,7 +57,20 @@ export class FamilyService {
         }
       };
 
-      await setDoc(this.getFamilyRef(familyId), family);
+      batch.set(this.getFamilyRef(familyId), family);
+
+      // Create the creator's member role
+      const creatorRole: FamilyMemberRole = {
+        userId: creatorId,
+        familyId,
+        role: 'parent',
+        joinedAt: serverTimestamp() as Timestamp,
+        isActive: true
+      };
+
+      batch.set(this.getFamilyMemberRoleRef(familyId, creatorId), creatorRole);
+
+      await batch.commit();
       return family;
     } catch (error) {
       console.error('Error creating family:', error);
@@ -86,8 +103,8 @@ export class FamilyService {
       const familiesRef = this.getFamiliesRef();
       const q = query(
         familiesRef,
-        where('members', 'array-contains', { userId }),
-        orderBy('updatedAt', 'desc')
+        where('memberIds', 'array-contains', userId),
+        orderBy('createdAt', 'desc')
       );
 
       const snapshot = await getDocs(q);
@@ -106,11 +123,10 @@ export class FamilyService {
   static async addFamilyMember(
     familyId: string,
     userId: string,
-    role: FamilyRole,
-    displayName: string,
-    photoURL?: string
+    role: FamilyRole
   ): Promise<void> {
     try {
+      const batch = writeBatch(db);
       const familyRef = this.getFamilyRef(familyId);
       const familyDoc = await getDoc(familyRef);
 
@@ -119,30 +135,31 @@ export class FamilyService {
       }
 
       const family = familyDoc.data() as Family;
-      const newMember: FamilyMember = {
+
+      // Check if user is already a member
+      if (family.memberIds.includes(userId)) {
+        throw new Error('User is already a member of this family');
+      }
+
+      // Add user to family's memberIds array
+      const updatedMemberIds = [...family.memberIds, userId];
+      batch.update(familyRef, {
+        memberIds: updatedMemberIds,
+        updatedAt: serverTimestamp() as Timestamp
+      });
+
+      // Create member role document
+      const memberRole: FamilyMemberRole = {
         userId,
+        familyId,
         role,
-        displayName,
-        photoURL,
         joinedAt: serverTimestamp() as Timestamp,
         isActive: true
       };
 
-      // Check if user is already a member
-      const existingMemberIndex = family.members.findIndex(m => m.userId === userId);
+      batch.set(this.getFamilyMemberRoleRef(familyId, userId), memberRole);
 
-      if (existingMemberIndex >= 0) {
-        // Update existing member
-        family.members[existingMemberIndex] = newMember;
-      } else {
-        // Add new member
-        family.members.push(newMember);
-      }
-
-      await updateDoc(familyRef, {
-        members: family.members,
-        updatedAt: serverTimestamp()
-      });
+      await batch.commit();
     } catch (error) {
       console.error('Error adding family member:', error);
       throw new Error('Failed to add family member');
@@ -152,6 +169,7 @@ export class FamilyService {
   // Remove member from family
   static async removeFamilyMember(familyId: string, userId: string): Promise<void> {
     try {
+      const batch = writeBatch(db);
       const familyRef = this.getFamilyRef(familyId);
       const familyDoc = await getDoc(familyRef);
 
@@ -160,15 +178,45 @@ export class FamilyService {
       }
 
       const family = familyDoc.data() as Family;
-      const updatedMembers = family.members.filter(m => m.userId !== userId);
 
-      await updateDoc(familyRef, {
-        members: updatedMembers,
+      // Remove user from family's memberIds array
+      const updatedMemberIds = family.memberIds.filter(id => id !== userId);
+      batch.update(familyRef, {
+        memberIds: updatedMemberIds,
         updatedAt: serverTimestamp()
       });
+
+      // Delete member role document
+      batch.delete(this.getFamilyMemberRoleRef(familyId, userId));
+
+      await batch.commit();
     } catch (error) {
       console.error('Error removing family member:', error);
       throw new Error('Failed to remove family member');
+    }
+  }
+
+  // Update member role
+  static async updateMemberRole(
+    familyId: string,
+    userId: string,
+    newRole: FamilyRole
+  ): Promise<void> {
+    try {
+      const memberRoleRef = this.getFamilyMemberRoleRef(familyId, userId);
+      const memberRoleDoc = await getDoc(memberRoleRef);
+
+      if (!memberRoleDoc.exists()) {
+        throw new Error('Member role not found');
+      }
+
+      await updateDoc(memberRoleRef, {
+        role: newRole,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error updating member role:', error);
+      throw new Error('Failed to update member role');
     }
   }
 
@@ -211,6 +259,7 @@ export class FamilyService {
   // Delete family (only by creator)
   static async deleteFamily(familyId: string, userId: string): Promise<void> {
     try {
+      const batch = writeBatch(db);
       const familyRef = this.getFamilyRef(familyId);
       const familyDoc = await getDoc(familyRef);
 
@@ -224,28 +273,58 @@ export class FamilyService {
         throw new Error('Only the family creator can delete the family');
       }
 
-      await deleteDoc(familyRef);
+      // Delete all member role documents
+      const memberRolesRef = this.getFamilyMemberRolesRef();
+      const memberRolesQuery = query(memberRolesRef, where('familyId', '==', familyId));
+      const memberRolesSnapshot = await getDocs(memberRolesQuery);
+
+      memberRolesSnapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      // Delete the family document
+      batch.delete(familyRef);
+
+      await batch.commit();
     } catch (error) {
       console.error('Error deleting family:', error);
       throw new Error('Failed to delete family');
     }
   }
 
-  // Get family members with user details
-  static async getFamilyMembersWithDetails(familyId: string): Promise<FamilyMember[]> {
+  // Get family member roles
+  static async getFamilyMemberRoles(familyId: string): Promise<FamilyMemberRole[]> {
     try {
-      const family = await this.getFamily(familyId);
+      const memberRolesRef = this.getFamilyMemberRolesRef();
+      const q = query(
+        memberRolesRef,
+        where('familyId', '==', familyId),
+        where('isActive', '==', true)
+      );
 
-      if (!family) {
-        throw new Error('Family not found');
-      }
+      const snapshot = await getDocs(q);
 
-      // In a real app, you might want to fetch additional user details
-      // from the users collection for each member
-      return family.members;
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as unknown as FamilyMemberRole));
     } catch (error) {
-      console.error('Error fetching family members:', error);
-      throw new Error('Failed to fetch family members');
+      console.error('Error fetching family member roles:', error);
+      throw new Error('Failed to fetch family member roles');
+    }
+  }
+
+  // Get family members with user details
+  static async getFamilyMembersWithDetails(familyId: string): Promise<(FamilyMemberRole & { userProfile?: UserProfile })[]> {
+    try {
+      const memberRoles = await this.getFamilyMemberRoles(familyId);
+
+      // Eventually, we would fetch user profiles for each member
+      // For now, we'll return just the member roles
+      return memberRoles;
+    } catch (error) {
+      console.error('Error fetching family members with details:', error);
+      throw new Error('Failed to fetch family members with details');
     }
   }
 
@@ -258,7 +337,7 @@ export class FamilyService {
         return false;
       }
 
-      return family.members.some(member => member.userId === userId);
+      return family.memberIds.includes(userId);
     } catch (error) {
       console.error('Error checking family membership:', error);
       return false;
@@ -268,17 +347,52 @@ export class FamilyService {
   // Get user's role in family
   static async getUserFamilyRole(familyId: string, userId: string): Promise<FamilyRole | null> {
     try {
-      const family = await this.getFamily(familyId);
+      const memberRoleRef = this.getFamilyMemberRoleRef(familyId, userId);
+      const memberRoleDoc = await getDoc(memberRoleRef);
 
-      if (!family) {
+      if (!memberRoleDoc.exists()) {
         return null;
       }
 
-      const member = family.members.find(m => m.userId === userId);
-      return member?.role || null;
+      const memberRole = memberRoleDoc.data() as FamilyMemberRole;
+      return memberRole.role;
     } catch (error) {
       console.error('Error getting user family role:', error);
       return null;
+    }
+  }
+
+  // Get all families where user has a specific role
+  static async getUserFamiliesByRole(userId: string, role: FamilyRole): Promise<Family[]> {
+    try {
+      const memberRolesRef = this.getFamilyMemberRolesRef();
+      const q = query(
+        memberRolesRef,
+        where('userId', '==', userId),
+        where('role', '==', role),
+        where('isActive', '==', true)
+      );
+
+      const snapshot = await getDocs(q);
+      const familyIds = snapshot.docs.map(doc => doc.data().familyId);
+
+      if (familyIds.length === 0) {
+        return [];
+      }
+
+      // Fetch the actual family documents
+      const families: Family[] = [];
+      for (const familyId of familyIds) {
+        const family = await this.getFamily(familyId);
+        if (family) {
+          families.push(family);
+        }
+      }
+
+      return families;
+    } catch (error) {
+      console.error('Error fetching user families by role:', error);
+      throw new Error('Failed to fetch user families by role');
     }
   }
 }
