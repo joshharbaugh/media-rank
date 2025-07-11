@@ -86,16 +86,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Listen for auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
-        if (user) {
-          await createUserProfile(user);
-          setUser(user);
+        setLoading(true);
+
+        if (firebaseUser) {
+          // Set user immediately to prevent redirect loop
+          setUser(firebaseUser);
+
+          // Then create/update profile
+          await createUserProfile(firebaseUser);
         } else {
           setUser(null);
+          setProfile(null);
         }
       } catch (err) {
         console.error('Error handling auth state change:', err);
+        // Even if profile creation fails, we should still set the user
+        if (firebaseUser) {
+          setUser(firebaseUser);
+        }
       } finally {
         setLoading(false);
       }
@@ -109,24 +119,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signInWithGoogle = async () => {
     try {
       setError(null);
+      setLoading(true);
       await signInWithPopup(auth, googleProvider);
       // Profile creation and theme sync will be handled by onAuthStateChanged
     } catch (err: unknown) {
       const error = err as Error;
       console.error('Google sign-in error:', error);
       setError(error.message || 'Failed to sign in with Google');
+    } finally {
+      setLoading(false);
     }
   };
 
   const signInWithEmail = async (email: string, password: string) => {
     try {
       setError(null);
+      setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
       // Profile creation and theme sync will be handled by onAuthStateChanged
     } catch (err: unknown) {
       const error = err as Error;
       console.error('Email sign-in error:', error);
       setError(error.message || 'Failed to sign in');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -134,6 +150,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signUpWithEmail = async (email: string, password: string, displayName: string) => {
     try {
       setError(null);
+      setLoading(true);
       const result = await createUserWithEmailAndPassword(auth, email, password);
 
       // Update display name
@@ -145,17 +162,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const error = err as Error;
       console.error('Sign-up error:', error);
       setError(error.message || 'Failed to create account');
+    } finally {
+      setLoading(false);
     }
   };
 
   // Sign out
   const logout = async () => {
     try {
+      setLoading(true);
       await signOut(auth);
     } catch (err: unknown) {
       const error = err as Error;
       console.error('Logout error:', error);
       setError(error.message || 'Failed to logout');
+    } finally {
+      setLoading(false);
     }
   };
 

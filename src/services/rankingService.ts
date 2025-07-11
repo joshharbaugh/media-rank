@@ -167,10 +167,6 @@ export class RankingService {
       const mostCommonRating = mostCommonRatingIndex + 1;
       stats['mostCommonRating'] = mostCommonRating;
 
-      // Recent activity (last 7 rankings)
-      // const recentRankings = [...rankings].slice(-7).reverse();
-      // stats['recentRankings'] = recentRankings;
-
       return stats;
     } catch (error) {
       console.error('Error calculating user stats:', error);

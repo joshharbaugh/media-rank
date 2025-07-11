@@ -43,7 +43,7 @@ export class FamilyService {
           userId: creatorId,
           role: 'parent',
           displayName: 'Creator', // Will be updated with actual user data
-          joinedAt: serverTimestamp() as Timestamp,
+          joinedAt: Timestamp.now(),
           isActive: true
         }],
         settings: {

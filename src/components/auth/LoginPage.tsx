@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/Auth';
 import { useThemeStore } from '@/store/themeStore';
@@ -20,6 +20,7 @@ export const LoginPage: React.FC = () => {
 
   const { signInWithGoogle, signInWithEmail, signUpWithEmail, resetPassword, error, clearError } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Apply theme class to root
   useEffect(() => {
@@ -56,10 +57,10 @@ export const LoginPage: React.FC = () => {
           return;
         }
         await signUpWithEmail(email, password, displayName);
-        navigate('/');
+        navigate((location.state as { from?: { pathname: string } })?.from?.pathname || '/');
       } else if (mode === 'login') {
         await signInWithEmail(email, password);
-        navigate('/');
+        navigate((location.state as { from?: { pathname: string } })?.from?.pathname || '/');
       } else if (mode === 'reset') {
         await resetPassword(email);
         setSuccessMessage('Password reset email sent! Check your inbox.');
@@ -77,7 +78,7 @@ export const LoginPage: React.FC = () => {
     try {
       setIsSubmitting(true);
       await signInWithGoogle();
-      navigate('/');
+      navigate((location.state as { from?: { pathname: string } })?.from?.pathname || '/');
     } catch (err) {
       // Error is handled in context
       console.error('Google sign-in failed:', err);

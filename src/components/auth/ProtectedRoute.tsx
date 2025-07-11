@@ -22,6 +22,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     }
   }, [theme]);
 
+  // Show loading spinner while authentication is being determined
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -30,10 +31,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
+  // If not loading and no user, redirect to login
   if (!user) {
-    // Redirect to login page but save the attempted location
+    // Save the attempted location for redirect after login
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // User is authenticated, render the protected content
   return <>{children}</>;
 };
