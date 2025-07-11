@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { User } from 'firebase/auth';
-import { UserProfile } from '@/types';
+import { UserProfile } from '@/types/user';
 
 interface UserStore {
   user: User | null;

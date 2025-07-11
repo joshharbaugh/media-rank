@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/Auth';
 import { RankingService } from '@/services/rankingService';
-import { Ranking, Media, UserStats } from '@/types';
+import { Ranking, Media } from '@/types';
+import { UserStats } from '@/types/user';
 import { v4 as uuidv4 } from 'uuid';
 import { Timestamp } from 'firebase/firestore';
 

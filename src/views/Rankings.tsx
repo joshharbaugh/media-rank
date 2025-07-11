@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Star, X, Trophy, Film, Tv, Book, Edit2, Gamepad2, Loader2 } from 'lucide-react';
-import { Ranking, UserStats } from '@/types';
+import { Ranking } from '@/types';
+import { UserStats } from '@/types/user';
 import { getMediaIcon } from '@/utils/helpers';
 import { useRankings } from '@/hooks/useRankings';
 import UISelect from '@/components/ui/Select';

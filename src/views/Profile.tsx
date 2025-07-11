@@ -4,7 +4,8 @@ import {
   Film, Tv, Book, BarChart3, PieChart, Calendar,
   Award, Sparkles, Gamepad2, Loader2
 } from 'lucide-react';
-import { Ranking, UserStats } from '@/types';
+import { Ranking } from '@/types';
+import { UserStats } from '@/types/user';
 import { getInitials, getMediaIcon } from '@/utils/helpers';
 import { useUserStore } from '@/store/userStore';
 import { db } from '@/lib/firebase';
