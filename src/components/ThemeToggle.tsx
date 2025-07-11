@@ -4,13 +4,18 @@ import { useThemeStore } from '@/store/themeStore';
 import { useUserStore } from '@/store/userStore';
 
 export const ThemeToggle = (): React.ReactNode => {
-  const { theme, toggleTheme } = useThemeStore();
-  const { updateProfile } = useUserStore();
+  const { theme, toggleTheme, updateFirebaseTheme } = useThemeStore();
+  const { user } = useUserStore();
 
-  // Update user profile with new theme
+  // Update both local state and Firebase
   function handleToggleTheme() {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
     toggleTheme();
-    updateProfile({ settings: { theme: theme === 'light' ? 'dark' : 'light' } });
+
+    // Update Firebase if user is authenticated
+    if (user?.uid) {
+      updateFirebaseTheme(user.uid, newTheme);
+    }
   }
 
   return (

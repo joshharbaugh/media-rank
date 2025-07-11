@@ -43,7 +43,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const { theme } = useThemeStore();
+  const { theme, syncThemeWithFirebase } = useThemeStore();
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
   const setProfile = useUserStore((state) => state.setProfile);
@@ -73,14 +73,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await setDoc(userRef, profile);
       setProfile(profile);
     } else {
-      // Update last login
+      // Update last login and sync theme
       await setDoc(userRef, {
-        updatedAt: serverTimestamp() as Timestamp,
-        settings: {
-          theme
-        }
+        updatedAt: serverTimestamp() as Timestamp
       }, { merge: true });
       setProfile(userSnap.data() as UserProfile);
+
+      // Sync theme from Firebase
+      await syncThemeWithFirebase(user.uid);
     }
   };
 
@@ -109,39 +109,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signInWithGoogle = async () => {
     try {
       setError(null);
-      setLoading(true);
-      const result = await signInWithPopup(auth, googleProvider);
-      await createUserProfile(result.user);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in with Google');
-      throw err;
-    } finally {
-      setLoading(false);
+      await signInWithPopup(auth, googleProvider);
+      // Profile creation and theme sync will be handled by onAuthStateChanged
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('Google sign-in error:', error);
+      setError(error.message || 'Failed to sign in with Google');
     }
   };
 
-  // Sign in with email/password
   const signInWithEmail = async (email: string, password: string) => {
     try {
       setError(null);
-      setLoading(true);
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      await createUserProfile(result.user);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      if (err.code === 'auth/user-not-found') {
-        setError('No account found with this email');
-      } else if (err.code === 'auth/wrong-password') {
-        setError('Incorrect password');
-      } else if (err.code === 'auth/invalid-email') {
-        setError('Invalid email address');
-      } else {
-        setError(err.message || 'Failed to sign in');
-      }
-      throw err;
-    } finally {
-      setLoading(false);
+      await signInWithEmailAndPassword(auth, email, password);
+      // Profile creation and theme sync will be handled by onAuthStateChanged
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('Email sign-in error:', error);
+      setError(error.message || 'Failed to sign in');
     }
   };
 
@@ -149,44 +134,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signUpWithEmail = async (email: string, password: string, displayName: string) => {
     try {
       setError(null);
-      setLoading(true);
-
-      // Create account
       const result = await createUserWithEmailAndPassword(auth, email, password);
 
       // Update display name
-      if (displayName) {
+      if (result.user) {
         await updateProfile(result.user, { displayName });
       }
-
-      // Create user profile
-      await createUserProfile(result.user);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      if (err.code === 'auth/email-already-in-use') {
-        setError('An account already exists with this email');
-      } else if (err.code === 'auth/weak-password') {
-        setError('Password should be at least 6 characters');
-      } else if (err.code === 'auth/invalid-email') {
-        setError('Invalid email address');
-      } else {
-        setError(err.message || 'Failed to create account');
-      }
-      throw err;
-    } finally {
-      setLoading(false);
+      // Profile creation and theme sync will be handled by onAuthStateChanged
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('Sign-up error:', error);
+      setError(error.message || 'Failed to create account');
     }
   };
 
   // Sign out
   const logout = async () => {
     try {
-      setError(null);
       await signOut(auth);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign out');
-      throw err;
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('Logout error:', error);
+      setError(error.message || 'Failed to logout');
     }
   };
 
@@ -195,16 +164,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setError(null);
       await sendPasswordResetEmail(auth, email);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      if (err.code === 'auth/user-not-found') {
-        setError('No account found with this email');
-      } else if (err.code === 'auth/invalid-email') {
-        setError('Invalid email address');
-      } else {
-        setError(err.message || 'Failed to send reset email');
-      }
-      throw err;
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('Password reset error:', error);
+      setError(error.message || 'Failed to send password reset email');
     }
   };
 
