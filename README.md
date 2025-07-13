@@ -7,9 +7,11 @@ A modern web application for discovering, ranking, and organizing your favorite 
 - **Multi-Media Search**: Search across movies, TV shows, books, and video games using integrated APIs
 - **Personal Rankings**: Create and manage your own ranked lists of media
 - **User Authentication**: Secure login system with Firebase Authentication
+- **Advanced User Search**: Elasticsearch-powered fuzzy search with typo tolerance and relevance scoring
 - **Dark/Light Theme**: Toggle between dark and light themes for comfortable viewing
 - **Responsive Design**: Modern UI built with Tailwind CSS and Radix UI components
 - **Real-time Data**: Live search results from multiple media APIs
+- **Intelligent Fallback**: Graceful degradation to Firestore when Elasticsearch is unavailable
 
 ## Tech Stack
 
@@ -18,6 +20,7 @@ A modern web application for discovering, ranking, and organizing your favorite 
 - **State Management**: Zustand
 - **Authentication**: Firebase Auth
 - **Database**: Firebase Firestore
+- **Search**: Elasticsearch (with Firestore fallback)
 - **Routing**: React Router DOM
 - **HTTP Client**: Axios
 - **Icons**: Lucide React
@@ -58,6 +61,8 @@ VITE_FIREBASE_APP_ID=your_firebase_app_id
 VITE_MOVIES_API_KEY=your_tmdb_api_key
 VITE_GAMES_API_KEY=your_games_api_key
 VITE_GAMES_API_BASE_URL=your_games_api_base_url
+VITE_ELASTICSEARCH_URL=your_elasticsearch_url
+VITE_ELASTICSEARCH_API_KEY=your_elasticsearch_api_key
 ```
 
 4. Start the development server:
@@ -102,6 +107,7 @@ The app integrates with multiple APIs to provide comprehensive media search:
 - **Movies & TV Shows**: The Movie Database (TMDB) API
 - **Books**: Google Books API
 - **Video Games**: IGDB API (via Vercel serverless function)
+- **User Search**: Elasticsearch for advanced fuzzy search capabilities
 
 ## Contributing
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import {
   User,
   signInWithPopup,
@@ -27,16 +27,8 @@ interface AuthContextType {
   clearError: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
 // eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -46,7 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { theme, syncThemeWithFirebase } = useThemeStore();
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
-  const setProfile = useUserStore((state) => state.setProfile);
+  const setUserProfile = useUserStore((state) => state.setUserProfile);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,13 +63,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
       await setDoc(userRef, profile);
-      setProfile(profile);
+      setUserProfile(profile);
     } else {
       // Update last login and sync theme
       await setDoc(userRef, {
         updatedAt: serverTimestamp() as Timestamp
       }, { merge: true });
-      setProfile(userSnap.data() as UserProfile);
+      setUserProfile(userSnap.data() as UserProfile);
 
       // Sync theme from Firebase
       await syncThemeWithFirebase(user.uid);
@@ -98,7 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           await createUserProfile(firebaseUser);
         } else {
           setUser(null);
-          setProfile(null);
+          setUserProfile(null);
         }
       } catch (err) {
         console.error('Error handling auth state change:', err);

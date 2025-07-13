@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import { useAuth } from '@/contexts/Auth';
+import { useAuth } from '@/hooks/useAuth';
 import { useThemeStore } from '@/store/themeStore';
 
 type AuthMode = 'login' | 'signup' | 'reset';

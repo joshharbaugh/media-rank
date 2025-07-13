@@ -5,8 +5,8 @@ import { UserService } from '@/services/userService';
 
 interface UserStore {
   user: User | null;
-  profile: UserProfile | null;
-  users: User[] | null;
+  userProfile: UserProfile | null;
+  users: UserProfile[] | null;
   loading: boolean;
   error: string | null;
 
@@ -14,14 +14,14 @@ interface UserStore {
   fetchUser: (userId: string) => Promise<void>;
   fetchUsersByName: (name: string) => Promise<void>;
   setUser: (user: User | null) => void;
-  setProfile: (profile: UserProfile | null) => void;
-  updateProfile: (profile: Partial<UserProfile>) => void;
+  setUserProfile: (userProfile: UserProfile | null) => void;
+  updateUserProfile: (userProfile: Partial<UserProfile>) => void;
   logout: () => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
   user: null,
-  profile: null,
+  userProfile: null,
   users: null,
   loading: false,
   error: null,
@@ -29,8 +29,8 @@ export const useUserStore = create<UserStore>((set) => ({
   fetchUser: async (userId: string) => {
     set({ loading: true, error: null });
     try {
-      const user = await UserService.getUser(userId);
-      set({ user, loading: false });
+      const userProfile = await UserService.getUserProfile(userId);
+      set({ userProfile, loading: false });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch user';
       set({ error: errorMessage, loading: false });
@@ -50,11 +50,11 @@ export const useUserStore = create<UserStore>((set) => ({
 
   setUser: (user) => set({ user }),
 
-  setProfile: (profile: UserProfile | null) => set({ profile }),
+  setUserProfile: (userProfile: UserProfile | null) => set({ userProfile }),
 
-  updateProfile: (updates) => set((state) => ({
-    profile: state.profile ? { ...state.profile, ...updates } : null
+  updateUserProfile: (updates) => set((state) => ({
+    userProfile: state.userProfile ? { ...state.userProfile, ...updates } : null
   })),
 
-  logout: () => set({ user: null, profile: null }),
+  logout: () => set({ user: null, userProfile: null }),
 }));

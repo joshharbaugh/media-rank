@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/contexts/Auth';
+import { useAuth } from '@/hooks/useAuth';
 import { RankingService } from '@/services/rankingService';
 import { Ranking, Media } from '@/types';
 import { UserStats } from '@/types/user';

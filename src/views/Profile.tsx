@@ -22,8 +22,8 @@ interface ProfileTabProps {
 
 export const ProfileView = ({ rankings }: ProfileTabProps): React.ReactElement => {
   const { getUserStats } = useRankings();
-  const userProfile = useUserStore((state) => state.profile);
-  const updateProfile = useUserStore((state) => state.updateProfile);
+  const userProfile = useUserStore((state) => state.userProfile);
+  const updateUserProfile = useUserStore((state) => state.updateUserProfile);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [tempBio, setTempBio] = useState(userProfile?.bio);
   const [stats, setStats] = useState<UserStats | null>(null);
@@ -44,7 +44,7 @@ export const ProfileView = ({ rankings }: ProfileTabProps): React.ReactElement =
       bio: tempBio,
       updatedAt: serverTimestamp()
     }, { merge: true });
-    updateProfile({ ...userProfile, bio: tempBio });
+    updateUserProfile({ ...userProfile, bio: tempBio });
 
     setIsEditingBio(false);
   };

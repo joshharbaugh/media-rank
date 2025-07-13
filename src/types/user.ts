@@ -6,6 +6,7 @@ export interface UserProfile {
   uid: string;
   email: string | null;
   displayName: string;
+  displayNameLower?: string; // Lowercase version for search indexing
   bio: string;
   photoURL: string | null;
   favoriteGenres: string[];

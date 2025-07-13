@@ -1,40 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { X, Users, Save, Loader2 } from 'lucide-react';
 import { useFamilyStore } from '@/store/familyStore';
-import { useUserStore } from '@/store/userStore';
+// import { useUserStore } from '@/store/userStore';
 import { FamilyRole } from '@/types/family';
+import { UserSearch } from '@/components/user/Search';
+import { UserProfile } from '@/types/user';
 
 interface AddFamilyMemberModalProps {
-  currentUserId: string;
+  // currentUserId: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
 export const AddFamilyMemberModal: React.FC<AddFamilyMemberModalProps> = ({
-  currentUserId,
+  // currentUserId,
   isOpen,
   onClose,
   onSuccess
 }) => {
   const { addFamilyMember, clearError, currentFamily, loading, error } = useFamilyStore();
-  const { users, loading: usersLoading, error: usersError, fetchUsersByName } = useUserStore();
+  // const { users, loading: usersLoading, error: usersError, fetchUsersByName } = useUserStore();
   const [userId, setUserId] = useState('');
   const [role] = useState<FamilyRole>('other');
-  const [search, setSearch] = useState('');
-  console.log('AddFamilyMemberModal', currentUserId);
+  // const [search, setSearch] = useState('');
 
   // Search for users
-  useEffect(() => {
-    if (search) {
-      // Debounce fetchUsersByName
-      const handler = setTimeout(() => {
-        fetchUsersByName(search);
-      }, 400);
-      return () => clearTimeout(handler);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+  // useEffect(() => {
+  //   if (search) {
+  //     // Debounce fetchUsersByName
+  //     const handler = setTimeout(() => {
+  //       fetchUsersByName(search);
+  //     }, 400);
+  //     return () => clearTimeout(handler);
+  //   }
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [search]);
+
+  const handleUserSelect = (user: UserProfile) => {
+    setUserId(user.uid);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +82,8 @@ export const AddFamilyMemberModal: React.FC<AddFamilyMemberModalProps> = ({
         </div>
 
         {/* Search for users */}
-        <div className="p-6 space-y-4">
+        <UserSearch onUserSelect={handleUserSelect} />
+        {/* <div className="p-6 space-y-4">
           <input
             type="text"
             placeholder="Search for users"
@@ -86,7 +92,6 @@ export const AddFamilyMemberModal: React.FC<AddFamilyMemberModalProps> = ({
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100"
           />
 
-          {/* Error and loading */}
           {usersError && (
             <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="text-sm text-red-600 dark:text-red-400">{usersError}</p>
@@ -98,20 +103,22 @@ export const AddFamilyMemberModal: React.FC<AddFamilyMemberModalProps> = ({
             </div>
           )}
 
-          {/* Users */}
           {users && !usersLoading && !usersError && (
             <div className="space-y-2 max-h-[300px] overflow-y-auto">
               {users.map((user) => (
                 <div key={user.uid} className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-colors" onClick={() => setUserId(user.uid)}>
                   <div className="flex items-center gap-2">
                     {user.photoURL && <img src={user.photoURL} alt="User" className="w-6 h-6 rounded-full" />}
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{user.displayName}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {user.displayName}
+                      {user.uid === currentUserId && <span className="text-xs text-gray-500 dark:text-gray-400"> (You)</span>}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </div> */}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">

@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { User, LogOut, Settings, ChevronDown } from 'lucide-react';
-import { useAuth } from '@/contexts/Auth';
+import { useUserStore } from '@/store/userStore';
 import { getInitials } from '@/utils/helpers';
 import { UserSettingsModal } from '@/components/user/SettingsModal';
 
 export function UserMenu() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useUserStore();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);

@@ -58,7 +58,6 @@ const getRoleLabel = (role: FamilyRole) => {
 };
 
 export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentUserId }) => {
-
   const { familyMembers, fetchFamilyMembersWithDetails } = useFamilyStore();
   const [showUpdateFamilyModal, setShowUpdateFamilyModal] = useState(false);
   const [showAddFamilyMemberModal, setShowAddFamilyMemberModal] = useState(false);
@@ -83,7 +82,7 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentU
 
       {/* Add Family Member Modal */}
       <AddFamilyMemberModal
-        currentUserId={currentUserId}
+        // currentUserId={currentUserId}
         isOpen={showAddFamilyMemberModal}
         onClose={() => setShowAddFamilyMemberModal(false)}
         onSuccess={() => setShowAddFamilyMemberModal(false)}
