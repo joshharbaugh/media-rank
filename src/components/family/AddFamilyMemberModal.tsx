@@ -7,14 +7,14 @@ import { UserSearch } from '@/components/user/Search';
 import { UserProfile } from '@/types/user';
 
 interface AddFamilyMemberModalProps {
-  // currentUserId: string;
+  currentUserId: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
 export const AddFamilyMemberModal: React.FC<AddFamilyMemberModalProps> = ({
-  // currentUserId,
+  currentUserId,
   isOpen,
   onClose,
   onSuccess
@@ -82,46 +82,10 @@ export const AddFamilyMemberModal: React.FC<AddFamilyMemberModalProps> = ({
         </div>
 
         {/* Search for users */}
-        <UserSearch onUserSelect={handleUserSelect} />
-        {/* <div className="p-6 space-y-4">
-          <input
-            type="text"
-            placeholder="Search for users"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100"
-          />
-
-          {usersError && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-600 dark:text-red-400">{usersError}</p>
-            </div>
-          )}
-          {usersLoading && (
-            <div className="p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
-              <p className="text-sm text-orange-600 dark:text-orange-400">Searching for users...</p>
-            </div>
-          )}
-
-          {users && !usersLoading && !usersError && (
-            <div className="space-y-2 max-h-[300px] overflow-y-auto">
-              {users.map((user) => (
-                <div key={user.uid} className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-colors" onClick={() => setUserId(user.uid)}>
-                  <div className="flex items-center gap-2">
-                    {user.photoURL && <img src={user.photoURL} alt="User" className="w-6 h-6 rounded-full" />}
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      {user.displayName}
-                      {user.uid === currentUserId && <span className="text-xs text-gray-500 dark:text-gray-400"> (You)</span>}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div> */}
+        <UserSearch currentUserId={currentUserId} onUserSelect={handleUserSelect} />
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        {userId && <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
             <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
@@ -156,7 +120,7 @@ export const AddFamilyMemberModal: React.FC<AddFamilyMemberModalProps> = ({
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 resize-none"
             />
           </div> */}
-        </form>
+        </form>}
 
         {/* Footer */}
         <div className="flex items-center justify-between gap-3 p-6 border-t border-gray-200 dark:border-gray-700">

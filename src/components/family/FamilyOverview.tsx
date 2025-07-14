@@ -82,7 +82,7 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({ family, currentU
 
       {/* Add Family Member Modal */}
       <AddFamilyMemberModal
-        // currentUserId={currentUserId}
+        currentUserId={currentUserId}
         isOpen={showAddFamilyMemberModal}
         onClose={() => setShowAddFamilyMemberModal(false)}
         onSuccess={() => setShowAddFamilyMemberModal(false)}

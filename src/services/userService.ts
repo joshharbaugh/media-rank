@@ -15,7 +15,7 @@ export class UserService {
   // Check if Elasticsearch is available
   private static async isElasticsearchAvailable(): Promise<boolean> {
     try {
-      return await ElasticService.healthCheck();
+      return await ElasticService.checkElasticsearch();
     } catch {
       console.warn('Elasticsearch not available, falling back to Firestore search');
       return false;

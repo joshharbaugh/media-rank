@@ -63,6 +63,8 @@ VITE_GAMES_API_KEY=your_games_api_key
 VITE_GAMES_API_BASE_URL=your_games_api_base_url
 VITE_ELASTICSEARCH_URL=your_elasticsearch_url
 VITE_ELASTICSEARCH_API_KEY=your_elasticsearch_api_key
+VITE_ELASTICSEARCH_USE_PROXY=false
+VITE_ELASTICSEARCH_PROXY_URL=http://localhost:3001
 ```
 
 4. Start the development server:
