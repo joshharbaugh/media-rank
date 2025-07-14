@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  console.log('Checking Elasticsearch health...');
+  console.log('Checking Elasticsearch health...', process.env.VITE_ELASTICSEARCH_URL, process.env.VITE_ELASTICSEARCH_API_KEY);
   // TODO: Check if Elasticsearch is available
   try {
     const response = await fetch(
