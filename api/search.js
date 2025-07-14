@@ -8,7 +8,7 @@ export default async function handler(req, res) {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.VITE_ELASTICSEARCH_API_KEY}`,
+          'Authorization': `ApiKey ${process.env.VITE_ELASTICSEARCH_API_KEY}`,
         },
       }
     );

@@ -67,7 +67,7 @@ export class ElasticService {
     };
 
     if (this.config.apiKey) {
-      headers['Authorization'] = `Bearer ${this.config.apiKey}`;
+      headers['Authorization'] = `ApiKey ${this.config.apiKey}`;
     }
 
     return headers;
